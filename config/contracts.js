@@ -18,11 +18,11 @@ module.exports = {
     contracts: {      
       "MiniMeTokenFactory": {},
       "MiniMeToken": {
-        "args":["$MiniMeTokenFactory", "0x0", "0x0", "Status Test Token", 18, "STT", true],
+        "args":["$MiniMeTokenFactory", "0x0000000000000000000000000000000000000000", "0x0000000000000000000000000000000000000000", "Status Test Token", 18, "STT", true],
       },
       "StatusRoot": {
         "instanceOf": "TestStatusNetwork",
-        "args": ["0x0", "$MiniMeToken"],
+        "args": ["0x0000000000000000000000000000000000000000", "$MiniMeToken"],
         "onDeploy": [
           "await MiniMeToken.methods.changeController(TestStatusNetwork.address).send()",
           "await StatusRoot.methods.setOpen(true).send()",
@@ -35,15 +35,7 @@ module.exports = {
   },
 
   development: {
-    deployment: {
-      accounts: [
-        {
-          privateKey: "b2ab40d549e67ba67f278781fec03b3a90515ad4d0c898a6326dd958de1e46fa",
-          balance: "5 ether"  // You can set the balance of the account in the dev environment
-                              // Balances are in Wei, but you can specify the unit with its name
-        }
-      ]
-    }
+   
   },
   testnet: {
     contracts: {
