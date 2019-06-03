@@ -1,0 +1,88 @@
+## Starting a Project
+- [x] Overview
+- [x] Specification Documentation
+- [x] Does it hold money?
+    - The contract facilitates the transfer of SNT from a sticker buyer to a sticker artist.
+    - It does not hold value.
+    - [x] how much?**
+        - N/A.
+    - [x] who controls it?**
+        - Status is the controller. 
+    - [x] how complex is its flow?**
+        - The sticker buyer signs a tx to transfer money, then the contract transfers that to the artist. It's two transactions with one signature.
+    - [x] is it locked up for a period of time ever?**
+        - Not really. The transactions should happen instantaneously. 
+- [x] How many smart contracts should it take to complete?**
+    - One smart contract, the registry. 
+    - [x] How complex is their interaction?**
+        - This is n/a at the moment.
+- [x] Is this project core to your business model?
+    - Yes, because it's a potentially high Tx volume SNT utility.
+    - [x] Does it control finances?
+        - No.
+    - [x] Does it influence user adoption?
+        - The feature aims at increasing engagement. In the future the option to gift stickers could be used to reach outside of the network and bring new users in. 
+    - [x] Does it lock up significant portions of your assets?
+        - No. Status is not holding any assets in the sticker market. The cost of a pack of stickers should hover around $2, and a buyer's funds are not locked, but transfered to the sticker artist. 
+    - [x] Is it unique to your business?
+        - Yes, only in that no other sticker market is backed by tokens. Our business model is dependent on flow of SNT, not taking proceeds from each sale. 100% of sales go to the artists. Otherwise, it mirrors a traditional sticker market. 
+- [x] How many users will it have?
+    - [x] Upon its deployment to mainnet?
+        - It's directly integrated within chat, Status' most obvious feature. Assuming that stickers see popularity similar to that of other apps, this could mean anywhere from 10-20% of the userbase uses stickers? 
+            - _FB messenger has 1.5B users and 380 million stickers sent per day. Assuming sticker users are sending on average 2 per day, that means approx. 16% of their users are sending them._  
+        - Our beta userbase is < 10k users.
+    - [x] Over time?
+        - [x] How does its footprint on the blockchain grow?**
+            - Storage growth is only in the ERC721 storage. 
+- [x] How many types of users will it have?
+    - Two: buyers and creator/sellers. The seller of a pack can be different than the creator. For instance, I might publish a pack to the marketplace but send SNT for its sales to another person's address. 
+    - [ ] Have you detailed their abilities within the project explicitely?
+- [x] How complex is the front end?
+    - Not very.
+    - [x] Is the FE's sole purpose to interact with the contract(s)?
+        - Yes.
+- [x] Does it intergrate with other things?
+    - It integrates with status-react. In the UI, the only entry point to the feature is currently through a message draft in chat, or through receiving a sticker from another user. It opens a panel to the marketplace, and stickers can be sent in private, group and public chats. The feature is limited to the context of chat.
+- [x] Will it need to be upgraded?**
+    - [x] How often**
+        - Hard to predict.
+    - [x] How complex is the migration to (a) new contract(s)?**
+        - Dependent upon upgrade requirements. 
+- [x] Does it have novel/complex cryptography or math functions?**
+    - Math: Percentage calculation
+
+## Wrapping up a Project
+- [x] Have you run analyzers on the contracts?
+    - No.
+    - [ ] Which ones?
+    - [ ] Where are the resutls and their response write-ups?
+- [ ] Has the specification sheet been updated throughout the project?
+    - [ ] How often?
+- [x] Have you performed any STRIDE sessions to hunt for vulnerabilities?
+    - No.
+- [x] Has it been tested on a testnet?
+    - It has been tested manually once. More manual testing is planned to check for regressions, bugs.
+    - [ ] What are the contract details for these deployments?
+- [x] Has it gone through an internal stress test?
+    - No.
+- [x] Is the front-end completed?
+    - Yes.
+- [x] Do you have an upgrade or succession plan in place?
+    - One of the following:
+        - New contract can be independent and older simply becomes view only. 
+        - New contract can be owner of the older contract which would be used only as ledger (by using generateToken function).
+        - New contract can be owner of current contract and migrate on demand to new contract ledger. (e.g. when a transfer is requested)
+- [x] Is front-running a potential problem?
+    - Unsure: we request all stickers packs from contract, we buy a pack, and we check if pack is owned by user.
+
+### Additional notes from [ToB Article](https://blog.trailofbits.com/2018/04/06/how-to-prepare-for-a-security-audit/)
+These notes are used to prepare for a formal audit, and should be performed before engaging an external professional.  By not doing them, you are wasting time and money.
+- [ ] Have all compiler warnings been addressed?
+    - [ ] Are you using the latest compiler to check for errors?
+    - [ ] What compiler will you use to deploy the contract and why?
+- [ ] Have tests been updated to the latest version of the code?
+    - [ ] How much code coverage do you have?
+- [ ] Has all unused code and libraries been eliminated from the codebase?
+- [ ] Have all functions been commented to explain what their intended use is?
+- [ ] Have all complex code blocks been commented to describe what they do?
+- [ ] Have all complicated tests been commented to describe what they are testing, and their expected results (both positive and negative)?
