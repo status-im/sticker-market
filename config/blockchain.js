@@ -16,8 +16,9 @@ module.exports = {
     proxy: true, // Proxy is used to present meaningful information about transactions
     accounts: [
       {
-        nodeAccounts: true,
-        password: "config/development/.password"
+        privateKey: "b2ab40d549e67ba67f278781fec03b3a90515ad4d0c898a6326dd958de1e46fa",
+        balance: "5 ether"  // You can set the balance of the account in the dev environment
+                            // Balances are in Wei, but you can specify the unit with its name
       }
     ],
     targetGasLimit: 8000000, // Target gas limit sets the artificial target gas floor for the blocks to mine
