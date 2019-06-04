@@ -23,18 +23,12 @@
 - `test`: Folder for tests
 
 ## How to run
-Requires https://github.com/creationix/nvm
 Usage: 
  ```bash
- nvm install v8.9.4
- nvm use v8.9.4
- npm install -g embark
- git clone https://github.com/status-im/contracts.git
- cd sticker-market
- npm install
- embark simulator
- embark test
- embark run
+git clone https://github.com/status-im/sticker-market.git
+cd sticker-market
+npm install
+npm start
  ```
 
 | Contract                               | Deploy | Test | UI  |
