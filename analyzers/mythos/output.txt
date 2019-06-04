@@ -1,0 +1,62 @@
+$ mythos analyze ./contracts/status/sticker-market/StickerMarket.sol StickerMarket --mythxEthAddress=0x2942577508e060ea092c0cd7802ae42c1cea2bae --mythxPassword=<supersecretpassword>
+Reading contract ./contracts/status/sticker-market/StickerMarket.sol... done
+Compiling with Solidity version: v0.5.6+commit.b259423e
+Compiling contract ./contracts/status/sticker-market/StickerMarket.sol... done
+Analyzing contract StickerMarket... done
+
+UUID: 8976cea1-3887-4f54-b22e-c384a36edf45
+API Version: v1.4.18
+Harvey Version: 0.0.23
+Maestro Version: 1.2.16
+Maru Version: 0.4.8
+Mythril Version: 0.20.8
+
+Report found: 0 issues
+Covered instructions: undefined
+Covered paths: undefined
+Selected compiler version: vUnknown
+
+Covered instructions: 0
+Covered paths: 0
+Selected compiler version: vundefined
+
+Title: (SWC-107) Reentrancy
+Severity: Medium
+Head: A call to a user-supplied address is executed.
+Description: The callee address of an external message call can be set by the caller. Note that the callee can contain arbitrary code and may re-enter any function in this contract. Review the business logic carefully to prevent averse effects on the contract state.
+Source code:
+
+./contracts/status/sticker-market/StickerMarket.sol 356:8
+--------------------------------------------------
+token.transfer(controller, balance)
+--------------------------------------------------
+
+==================================================
+
+Title: (SWC-110) Assert Violation
+Severity: Low
+Head: A reachable exception has been detected.
+Description: It is possible to trigger an exception (opcode 0xfe). Exceptions can be caused by type errors, division by zero, out-of-bounds array access, or assert violations. Note that explicit `assert()` should only be used to check invariants. Use `require()` for regular input checking.
+Source code:
+
+./contracts/status/sticker-market/StickerMarket.sol 273:8
+--------------------------------------------------
+state = _state
+--------------------------------------------------
+
+==================================================
+
+Title: (SWC-110) Assert Violation
+Severity: Low
+Head: A reachable exception has been detected.
+Description: It is possible to trigger an exception (opcode 0xfe). Exceptions can be caused by type errors, division by zero, out-of-bounds array access, or assert violations. Note that explicit `assert()` should only be used to check invariants. Use `require()` for regular input checking.
+Source code:
+
+./contracts/status/sticker-market/StickerMarket.sol 393:17
+--------------------------------------------------
+availablePacks[_category][_index]
+--------------------------------------------------
+
+==================================================
+
+Done

@@ -1,0 +1,113 @@
+{
+    "elapsed": 135604,
+    "issues": [
+        {
+            "issues": [],
+            "sourceType": "solidity-file",
+            "sourceFormat": "unknown",
+            "sourceList": [],
+            "meta": {
+                "logs": [
+                    {
+                        "level": "error",
+                        "msg": "Maru:TypeError: Cannot read property 'nodeType' of null"
+                    }
+                ],
+                "selectedCompiler": "Unknown"
+            }
+        },
+        {
+            "issues": [
+                {
+                    "swcID": "SWC-107",
+                    "swcTitle": "Reentrancy",
+                    "description": {
+                        "head": "A call to a user-supplied address is executed.",
+                        "tail": "The callee address of an external message call can be set by the caller. Note that the callee can contain arbitrary code and may re-enter any function in this contract. Review the business logic carefully to prevent averse effects on the contract state."
+                    },
+                    "severity": "Medium",
+                    "locations": [
+                        {
+                            "sourceMap": "11625:35:4"
+                        }
+                    ],
+                    "extra": {
+                        "testCases": null
+                    }
+                },
+                {
+                    "swcID": "SWC-110",
+                    "swcTitle": "Assert Violation",
+                    "description": {
+                        "head": "A reachable exception has been detected.",
+                        "tail": "It is possible to trigger an exception (opcode 0xfe). Exceptions can be caused by type errors, division by zero, out-of-bounds array access, or assert violations. Note that explicit `assert()` should only be used to check invariants. Use `require()` for regular input checking."
+                    },
+                    "severity": "Low",
+                    "locations": [
+                        {
+                            "sourceMap": "9158:14:4"
+                        }
+                    ],
+                    "extra": {
+                        "testCases": null
+                    }
+                },
+                {
+                    "swcID": "SWC-110",
+                    "swcTitle": "Assert Violation",
+                    "description": {
+                        "head": "A reachable exception has been detected.",
+                        "tail": "It is possible to trigger an exception (opcode 0xfe). Exceptions can be caused by type errors, division by zero, out-of-bounds array access, or assert violations. Note that explicit `assert()` should only be used to check invariants. Use `require()` for regular input checking."
+                    },
+                    "severity": "Low",
+                    "locations": [
+                        {
+                            "sourceMap": "12544:33:4"
+                        }
+                    ],
+                    "extra": {
+                        "testCases": null
+                    }
+                }
+            ],
+            "sourceType": "solidity-file",
+            "sourceFormat": "text",
+            "sourceList": [
+                "./contracts/status/sticker-market/StickerMarket.sol",
+                "./contracts/token/NonfungibleToken.sol",
+                "./contracts/token/ERC20Token.sol",
+                "./contracts/token/ApproveAndCallFallBack.sol",
+                "./contracts/common/Controlled.sol",
+                "./contracts/token/ERC721.sol",
+                "./contracts/token/ERC721Receiver.sol",
+                "./contracts/common/SafeMath.sol",
+                "./contracts/common/Address.sol",
+                "./contracts/common/Introspective.sol"
+            ],
+            "meta": {
+                "coveredInstructions": 0,
+                "coveredPaths": 0,
+                "logs": [
+                    {
+                        "level": "info",
+                        "msg": "skipped automated fuzz testing due to incompatible bytecode input"
+                    }
+                ]
+            }
+        }
+    ],
+    "status": {
+        "apiVersion": "v1.4.18",
+        "clientToolName": "mythos",
+        "harveyVersion": "0.0.23",
+        "maestroVersion": "1.2.16",
+        "maruVersion": "0.4.8",
+        "mythrilVersion": "0.20.8",
+        "queueTime": 11604,
+        "runTime": 94299,
+        "status": "Finished",
+        "submittedAt": "2019-06-04T19:24:01.511Z",
+        "submittedBy": "5cf6c23f5b7afd001944d1a4",
+        "uuid": "8976cea1-3887-4f54-b22e-c384a36edf45"
+    }
+}
