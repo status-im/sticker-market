@@ -138,6 +138,7 @@ contract("StickerMarket", function() {
         await StickerMarket.methods.setBurnRate(burnRate).send();
         let packBuyer = accounts[2];
         for(let i = 0; i < registeredPacks.length; i++){
+            console.log("price", registeredPacks[i].data.price)
             await TestStatusNetwork.methods.mint(registeredPacks[i].data.price).send({from: packBuyer });
             await MiniMeToken.methods.approve(StickerMarket.address, registeredPacks[i].data.price).send({from: packBuyer });
             let buy = await StickerMarket.methods.buyToken(registeredPacks[i].id, packBuyer).send({from: packBuyer });
@@ -150,16 +151,17 @@ contract("StickerMarket", function() {
             for(let j = 0; j < buy.events.Transfer.length; j++) {
                 if(buy.events.Transfer[j].address == MiniMeToken.address){
                     if(buy.events.Transfer[j].returnValues.to == StickerMarket.address){
-                        donated = parseInt(buy.events.Transfer[j].raw.data, 16).toString(10)
+                        donated = buy.events.Transfer[j].returnValues.value;
                     }else if(buy.events.Transfer[j].returnValues.to == registeredPacks[i].data.owner){
-                        toArtist = parseInt(buy.events.Transfer[j].raw.data, 16).toString(10)
+                        toArtist = buy.events.Transfer[j].returnValues.value;
                     }else if(buy.events.Transfer[j].returnValues.to == burnAddress){
-                        burned = parseInt(buy.events.Transfer[j].raw.data, 16).toString(10)
+                        burned = buy.events.Transfer[j].returnValues.value;
                     }
                 }else if(buy.events.Transfer[j].address == StickerMarket.address){
-                    tokenId = buy.events.Transfer[j].returnValues.tokenId;
+                    tokenId = buy.events.Transfer[j].returnValues.value;
                 }
             }
+
 
             assert.equal(registeredPacks[i].data.price, (+toArtist + +donated + +burned), "Bad payment")
             assert.equal(burned, (registeredPacks[i].data.price * burnRate) / 10000, "Bad burn") 
@@ -187,17 +189,18 @@ contract("StickerMarket", function() {
 
             for(let j = 0; j < buy.events.Transfer.length; j++) {
                 if(buy.events.Transfer[j].address == MiniMeToken.address){
-                    if(buy.events.Transfer[j].returnValues[1] == StickerMarket.address){
-                        donated = parseInt(buy.events.Transfer[j].raw.data, 16).toString(10)
-                    }else if(buy.events.Transfer[j].returnValues[1] == registeredPacks[i].data.owner){
-                        toArtist = parseInt(buy.events.Transfer[j].raw.data, 16).toString(10)
-                    }else if(buy.events.Transfer[j].returnValues[1] == burnAddress){
-                        burned = parseInt(buy.events.Transfer[j].raw.data, 16).toString(10)
+                    if(buy.events.Transfer[j].returnValues.to == StickerMarket.address){
+                        donated = buy.events.Transfer[j].returnValues.value
+                    }else if(buy.events.Transfer[j].returnValues.to == registeredPacks[i].data.owner){
+                        toArtist = buy.events.Transfer[j].returnValues.value
+                    }else if(buy.events.Transfer[j].returnValues.to == burnAddress){
+                        burned = buy.events.Transfer[j].returnValues.value
                     }
                 }else if(buy.events.Transfer[j].address == StickerMarket.address){
-                    tokenId = parseInt(buy.events.Transfer[j].raw.data, 16).toString(10);
+                    tokenId = buy.events.Transfer[j].returnValues.value;
                 }
             }
+
             assert.equal(registeredPacks[i].data.price, (+toArtist + +donated + +burned), "Bad payment")
             assert.equal(burned, (registeredPacks[i].data.price * burnRate) / 10000, "Bad burn") 
             assert.equal(donated, ((+registeredPacks[i].data.price - burned) * registeredPacks[i].data.donate)/10000, "Bad donate")

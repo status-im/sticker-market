@@ -13,7 +13,7 @@ interface ERC721 /* is ERC165 */ {
      *  may be created and assigned without emitting Transfer. At the time of
      *  any transfer, the approved address for that NFT (if any) is reset to none.
      */
-    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+    event Transfer(address indexed from, address indexed to, uint256 indexed value);
     
     /**
      * @dev This emits when the approved address for an NFT is changed or

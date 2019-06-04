@@ -620,7 +620,7 @@ contract MiniMeToken is Controlled {
 // Events
 ////////////////
     event ClaimedTokens(address indexed token, address indexed controller, uint amount);
-    event Transfer(address indexed from, address indexed to, uint256 amount);
+    event Transfer(address indexed from, address indexed to, uint256 indexed value);
     event NewCloneToken(address indexed cloneToken, uint snapshotBlock);
     event Approval(
         address indexed owner,
