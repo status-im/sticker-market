@@ -2,7 +2,7 @@ import EmbarkJS from 'Embark/EmbarkJS';
 import StatusRoot from 'Embark/contracts/StatusRoot';
 import MiniMeToken from 'Embark/contracts/MiniMeToken';
 import React from 'react';
-import { Form, FormGroup, FormControl, HelpBlock, Button } from 'react-bootstrap';
+import { Form, FormGroup, FormControl, Button } from 'react-bootstrap';
 import ERC20TokenUI from './erc20token';
 
 class TestStatusNetworkUI extends React.Component {
@@ -29,7 +29,7 @@ class TestStatusNetworkUI extends React.Component {
     
     render(){
       return (<React.Fragment>
-          <h3> Test Status Network</h3>
+          <h1> Test Status Network Token</h1>
           <Form inline>
             <FormGroup>
               <FormControl
