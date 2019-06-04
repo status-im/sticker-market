@@ -1,6 +1,6 @@
 pragma solidity >=0.5.0 <0.6.0;
 
-import "../../token/NonfungibleToken.sol";
+import "../../nft/tokens/nf-token-enumerable.sol";
 import "../../token/ERC20Token.sol";
 import "../../token/ApproveAndCallFallBack.sol";
 import "../../common/Controlled.sol";
@@ -9,7 +9,7 @@ import "../../common/Controlled.sol";
  * @author Ricardo Guilherme Schmidt (Status Research & Development GmbH) 
  * StickerMarket allows any address register "StickerPack" which can be sold to any address in form of "StickerPack", an ERC721 token.
  */
-contract StickerMarket is Controlled, NonfungibleToken, ApproveAndCallFallBack {
+contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack {
     event Register(uint256 indexed packId, uint256 dataPrice, bytes _contenthash);
     event Categorized(bytes4 indexed category, uint256 indexed packId);
     event Uncategorized(bytes4 indexed category, uint256 indexed packId);
@@ -561,7 +561,7 @@ contract StickerMarket is Controlled, NonfungibleToken, ApproveAndCallFallBack {
     {
         tokenId = tokenCount++;
         tokenPackId[tokenId] = _packId;
-        mint(_owner, tokenId);
+        _mint(_owner, tokenId);
     }
     
     /** 
