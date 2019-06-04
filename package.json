@@ -22,6 +22,7 @@
     "@babel/preset-env": "^7.2.3"
   },
   "dependencies": {
+    "@trailofbits/embark-contract-info": "^1.1.0",
     "elliptic-curve": "^0.1.0",
     "embark-graph": "^4.0.0",
     "embarkjs-connector-web3": "^4.0.0",
