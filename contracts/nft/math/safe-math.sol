@@ -1,4 +1,4 @@
-pragma solidity 0.5.6;
+pragma solidity >=0.5.0 <0.6.0;
 
 /**
  * @dev Math operations with safety checks that throw on error. This contract is based on the 

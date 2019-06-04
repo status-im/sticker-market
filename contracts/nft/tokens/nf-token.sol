@@ -1,4 +1,4 @@
-pragma solidity 0.5.6;
+pragma solidity >=0.5.0 <0.6.0;
 
 import "./erc721.sol";
 import "./erc721-token-receiver.sol";
@@ -47,14 +47,14 @@ contract NFToken is
    * created (`from` == 0) and destroyed (`to` == 0). Exception: during contract creation, any
    * number of NFTs may be created and assigned without emitting Transfer. At the time of any
    * transfer, the approved address for that NFT (if any) is reset to none.
-   * @param _from Sender of NFT (if address is zero address it indicates token creation).
-   * @param _to Receiver of NFT (if address is zero address it indicates token destruction).
-   * @param _tokenId The NFT that got transfered.
+   * @param from Sender of NFT (if address is zero address it indicates token creation).
+   * @param to Receiver of NFT (if address is zero address it indicates token destruction).
+   * @param value The NFT that got transfered.
    */
   event Transfer(
-    address indexed _from,
-    address indexed _to,
-    uint256 indexed _tokenId
+    address indexed from,
+    address indexed to,
+    uint256 indexed value
   );
 
   /**

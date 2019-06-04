@@ -150,7 +150,7 @@ contract("StickerMarket", function() {
             let donated = 0;
             let burned = 0;
             let burnAddress =(await MiniMeToken.methods.controller().call());
-
+         
             for(let j = 0; j < buy.events.Transfer.length; j++) {
                 if(buy.events.Transfer[j].address == MiniMeToken.address){
                     if(buy.events.Transfer[j].returnValues.to == StickerMarket.address){
@@ -166,7 +166,7 @@ contract("StickerMarket", function() {
             }
 
 
-            assert.equal(registeredPacks[i].data.price, (+toArtist + +donated + +burned), "Bad payment")
+            assert.equal(registeredPacks[i].data.price, (+toArtist + +donated + +burned))
             assert.equal(burned, (registeredPacks[i].data.price * burnRate) / 10000, "Bad burn") 
             assert.equal(donated, ((+registeredPacks[i].data.price - burned) * registeredPacks[i].data.donate)/10000, "Bad donate")
             assert.equal(toArtist, registeredPacks[i].data.price - (+donated + +burned), "Bad profit")

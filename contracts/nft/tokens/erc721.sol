@@ -1,4 +1,4 @@
-pragma solidity 0.5.6;
+pragma solidity >=0.5.0 <0.6.0;
 
 /**
  * @dev ERC-721 non-fungible token standard. 
@@ -14,9 +14,9 @@ interface ERC721
    * transfer, the approved address for that NFT (if any) is reset to none.
    */
   event Transfer(
-    address indexed _from,
-    address indexed _to,
-    uint256 indexed _tokenId
+    address indexed from,
+    address indexed to,
+    uint256 indexed value
   );
 
   /**
