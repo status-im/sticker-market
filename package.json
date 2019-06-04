@@ -27,6 +27,7 @@
     "@trailofbits/embark-contract-info": "^1.1.0",
     "embark": "^4.0.2",
     "embark-graph": "^4.0.0",
+    "embark-mythx": "^1.0.2",
     "embarkjs-connector-web3": "^4.0.0",
     "ethereumjs-util": "^5.1.5",
     "react-blockies": "^1.4.0",
