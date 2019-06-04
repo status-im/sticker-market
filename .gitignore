@@ -8,6 +8,7 @@ __pycache__/
 chains.json
 .password
 embark_demo/
+embarkArtifacts/
 
 # egg-related
 viper.egg-info/

@@ -53,11 +53,14 @@
 
 ## Wrapping up a Project
 - [x] Have you run analyzers on the contracts?
-    - No.
-    - [ ] Which ones?
-    - [ ] Where are the resutls and their response write-ups?
-- [ ] Has the specification sheet been updated throughout the project?
+    - Yes
+    - [x] Which ones?
+        - `slither@0.6.4`, current output in `./analyzers/slither/`
+        - `embark-graph@4.0.2`, current output in `./analyzers/embark-graph/`
+    - [x] Where are the resutls and their response write-ups?
+- [x] Has the specification sheet been updated throughout the project?
     - [ ] How often?
+        not sure @Rachel?
 - [x] Have you performed any STRIDE sessions to hunt for vulnerabilities?
     - No.
 - [x] Has it been tested on a testnet?

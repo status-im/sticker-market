@@ -12,6 +12,11 @@
   - `namesystem.js`
   - `storage.js`
   - `webserver.js`
+- `contracts`: Folder for storing all Solidity contracts
+  - `common`: Common standard contracts
+  - `status`: Status specific contracts
+    - `sticker-market`: **Main focus contracts**
+  - `token`: Standard token contracts
 - `doc`
   - `project_questions.md`: file answering a list of questions around project status
   - `specification.md`: current specefication document
