@@ -2,6 +2,7 @@ const Utils = require('../utils/testUtils');
 const MiniMeToken = require('Embark/contracts/MiniMeToken');
 const TestStatusNetwork = require('Embark/contracts/TestStatusNetwork');
 const StickerMarket = require('Embark/contracts/StickerMarket');
+const StickerMarketMigrated = require('Embark/contracts/StickerMarketMigrated');
 
 config({
   contracts: {
@@ -18,6 +19,9 @@ config({
     },
     "StickerMarket": {
         "args": ["$MiniMeToken"]
+    },
+    "StickerMarketMigrated": {
+        "args": ["$MiniMeToken", "$StickerMarket"]
     }
   }
 });
@@ -138,7 +142,6 @@ contract("StickerMarket", function() {
         await StickerMarket.methods.setBurnRate(burnRate).send();
         let packBuyer = accounts[2];
         for(let i = 0; i < registeredPacks.length; i++){
-            console.log("price", registeredPacks[i].data.price)
             await TestStatusNetwork.methods.mint(registeredPacks[i].data.price).send({from: packBuyer });
             await MiniMeToken.methods.approve(StickerMarket.address, registeredPacks[i].data.price).send({from: packBuyer });
             let buy = await StickerMarket.methods.buyToken(registeredPacks[i].id, packBuyer).send({from: packBuyer });
@@ -261,6 +264,22 @@ contract("StickerMarket", function() {
         Utils.expectThrow(StickerMarket.methods.buyToken(packId, packBuyer).send({from: packBuyer }));
         await StickerMarket.methods.purgePack(packId, 0).send();  
 
+    });
+
+
+    it("should migrate registry", async function() {
+        await StickerMarket.methods.setMarketState(3).send();
+        await StickerMarket.methods.changeController(StickerMarketMigrated.options.address).send();
+
+        let testPack = "0x0000000000000000000000000000000000000000000000000000000000000000";
+        let testPackPrice = "0";
+        let packOwner = accounts[1];
+        let packBuyer = accounts[2];
+        let reg = await StickerMarketMigrated.methods.registerPack(testPackPrice, 0, ["0x00000000"], packOwner, testPack).send();
+        let packId = reg.events.Register.returnValues.packId;
+        await TestStatusNetwork.methods.mint("1").send({from: packBuyer });
+        await StickerMarketMigrated.methods.buyToken(packId, packBuyer).send({from: packBuyer });
+        await StickerMarketMigrated.methods.purgePack(packId, 0).send();  
     });
 
 });
