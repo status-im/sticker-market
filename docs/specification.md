@@ -127,6 +127,11 @@ Paid packs trigger transactions.
 
 Should be optional for creator to set and edit the price of a sticker pack after publishing, to allow for adjustments in response to any currency volatility.
 
+### Payment
+For the MVP, because we are only offering pre-commissioned sticker packers and users are purchasing them.  All proceeds are forwarded to the Controller, which is a multi-sig account.  
+
+Future iterations will change this, and the multisig will be moved to a DAO to decentralize the control and decision making of whatever funds end up in it (fees, etc.)
+
 ### Open Questions
 - Use of a local cache for sticker storage?
 
