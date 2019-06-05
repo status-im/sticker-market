@@ -15,9 +15,6 @@
   },
   "plugins": {
     "embarkjs-connector-web3": {},
-    "embark-mythx": {
-      "ignore": ["Ownable", "Migrations"]
-    },
     "@trailofbits/embark-contract-info": {
       "flags": ""
     }
