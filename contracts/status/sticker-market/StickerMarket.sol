@@ -475,7 +475,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     }
 
     /** 
-     * @dev register new pack to owner
+     * @dev charges registerFee and register new pack to owner
      */
     function register(
         address _caller,
@@ -490,7 +490,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         returns(uint256 packId) 
     {
         if(registerFee > 0){
-            require(snt.transferFrom(_caller, address(this), registerFee), "Bad payment");
+            require(snt.transferFrom(_caller, controller, registerFee), "Bad payment");
         }
         require(_donate <= 10000, "Bad argument, _donate cannot be more then 100.00%");
         packId = register(_category, _owner, _price, _donate, _contenthash);
@@ -543,7 +543,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         if(amount > 0 && _pack.donate > 0) {
             uint256 donate = (amount * _pack.donate) / 10000;
             amount -= donate;
-            require(snt.transferFrom(_caller, address(this), donate), "Bad donate");
+            require(snt.transferFrom(_caller, controller, donate), "Bad donate");
         } 
         if(amount > 0) {
             require(snt.transferFrom(_caller, _pack.owner, amount), "Bad payment");

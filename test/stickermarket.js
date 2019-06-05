@@ -150,10 +150,10 @@ contract("StickerMarket", function() {
             let donated = 0;
             let burned = 0;
             let burnAddress =(await MiniMeToken.methods.controller().call());
-         
+            let controller = accounts[0];``
             for(let j = 0; j < buy.events.Transfer.length; j++) {
                 if(buy.events.Transfer[j].address == MiniMeToken.address){
-                    if(buy.events.Transfer[j].returnValues.to == StickerMarket.address){
+                    if(buy.events.Transfer[j].returnValues.to == controller){
                         donated = buy.events.Transfer[j].returnValues.value;
                     }else if(buy.events.Transfer[j].returnValues.to == registeredPacks[i].data.owner){
                         toArtist = buy.events.Transfer[j].returnValues.value;
@@ -189,10 +189,10 @@ contract("StickerMarket", function() {
             let donated = 0;
             let burned = 0;
             let burnAddress =(await MiniMeToken.methods.controller().call());
-
+            let controller = accounts[0];``
             for(let j = 0; j < buy.events.Transfer.length; j++) {
                 if(buy.events.Transfer[j].address == MiniMeToken.address){
-                    if(buy.events.Transfer[j].returnValues.to == StickerMarket.address){
+                    if(buy.events.Transfer[j].returnValues.to == controller){
                         donated = buy.events.Transfer[j].returnValues.value
                     }else if(buy.events.Transfer[j].returnValues.to == registeredPacks[i].data.owner){
                         toArtist = buy.events.Transfer[j].returnValues.value
