@@ -13,7 +13,7 @@ config/livenet/password
 config/production/password
 dist
 embarkArtifacts
-
+crytic-export
 
 # egg-related
 viper.egg-info/
