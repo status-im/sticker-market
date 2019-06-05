@@ -48,16 +48,23 @@ Compiling contracts
 contracts/status/sticker-market/README.md doesn't have a compatible contract compiler. Maybe a plugin exists for it.
 contracts/status/sticker-market/README.md doesn't have a compatible contract compiler. Maybe a plugin exists for it.
   StickerMarket
-    ✓ should register packs (1301ms) - [3592112 gas]
-    ✓ should categorize packs (870ms) - [810808 gas]
-    ✓ should uncategorize packs (901ms) - [288465 gas]
-    ✓ should mint packs (1792ms) - [3505648 gas]
-    ✓ should mint packs with approveAndCall (1747ms) - [3221506 gas]
-    ✓ should register pack with approveAndCall (451ms) - [936548 gas]
-    ✓ should purge packs (464ms) - [361631 gas]
-    ✓ should not mint a pack with price 0 (238ms) - [466792 gas]
-    ✓ should migrate registry (273ms) - [550475 gas]
+    ✓ should register packs (1120ms) - [3592664 gas]
+    ✓ should categorize packs (894ms) - [810984 gas]
+    ✓ should uncategorize packs (971ms) - [288564 gas]
+    ✓ should mint packs (1855ms) - [3842190 gas]
+    ✓ should mint packs with approveAndCall (1920ms) - [3589096 gas]
+    ✓ should register pack with approveAndCall (438ms) - [904022 gas]
+    ✓ should purge packs (474ms) - [361631 gas]
+    ✓ should not mint a pack with price 0 (275ms) - [466774 gas]
+    ✓ should change ownership of pack by user (122ms) - [302190 gas]
+    ✓ should change ownership of pack by controller (120ms) - [301833 gas]
+    ✓ should change price of pack by user (156ms) - [320666 gas]
+    ✓ should change price of pack by controller (119ms) - [335373 gas]
+    ✓ should change pack mintability by user (122ms) - [315775 gas]
+    ✓ should change pack mintability by controller (126ms) - [315418 gas]
+    ✓ should change pack contenthash by controller (186ms) - [320989 gas]
+    ✓ should migrate registry (292ms) - [596407 gas]
 
 
-  9 passing (24s) - [Total: 30804644 gas]
+  16 passing (10s) - [Total: 31234047 gas]
   ```
