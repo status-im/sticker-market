@@ -390,6 +390,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         view 
         returns (uint256 packId)
     {
+        require(availablePacks[_category].length > _index, "Out of bounds");
         packId = availablePacks[_category][_index];
     }
     
