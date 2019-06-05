@@ -347,13 +347,15 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         external
         onlyController 
     {
+        uint256 balance;
         if (_token == address(0)) {
-            address(controller).transfer(address(this).balance);
-            return;
+            balance = address(this).balance;
+            address(controller).transfer(balance);
+        } else {
+            ERC20Token token = ERC20Token(_token);
+            balance = token.balanceOf(address(this));
+            token.transfer(controller, balance);
         }
-        ERC20Token token = ERC20Token(_token);
-        uint256 balance = token.balanceOf(address(this));
-        token.transfer(controller, balance);
         emit ClaimedTokens(_token, controller, balance);
     }
     
@@ -390,7 +392,6 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         view 
         returns (uint256 packId)
     {
-        require(availablePacks[_category].length > _index, "Out of bounds");
         packId = availablePacks[_category][_index];
     }
     
