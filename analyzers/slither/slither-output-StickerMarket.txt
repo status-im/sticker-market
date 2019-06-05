@@ -1,0 +1,159 @@
+Compilation warnings/errors on ./contracts/status/sticker-market/StickerMarket.sol:
+Warning: This is a pre-release compiler version, please do not use it in production.
+
+INFO:Detectors:
+NonfungibleToken._ownedTokens (contracts/token/NonfungibleToken.sol#29) is never initialized. It is used in:
+	- balanceOf (contracts/token/NonfungibleToken.sol#78-81)
+	- tokensOwnedBy (contracts/token/NonfungibleToken.sol#195-197)
+	- tokenOfOwnerByIndex (contracts/token/NonfungibleToken.sol#204-207)
+	- mint (contracts/token/NonfungibleToken.sol#225-232)
+	- burn (contracts/token/NonfungibleToken.sol#241-249)
+	- transfer (contracts/token/NonfungibleToken.sol#266-276)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+INFO:Detectors:
+Address.isContract (contracts/common/Address.sol#14-25) is declared view but contains assembly code
+StickerMarket.abiDecodeSig (contracts/status/sticker-market/StickerMarket.sol#539-543) is declared view but contains assembly code
+StickerMarket.slice (contracts/status/sticker-market/StickerMarket.sol#545-600) is declared view but contains assembly code
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#constant-functions-changing-the-state
+INFO:Detectors:
+StickerMarket.packOwner (contracts/status/sticker-market/StickerMarket.sol#65-68) uses a dangerous strict equality:
+	- require(bool)(msg.sender == controller || packs[_packId].owner == msg.sender)
+StickerMarket.purgePack (contracts/status/sticker-market/StickerMarket.sol#237-263) uses a dangerous strict equality:
+	- packs[_packId].category.length == 0
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+INFO:Detectors:
+StickerMarket.claimTokens (contracts/status/sticker-market/StickerMarket.sol#322-334) ignores return value by external calls "token.transfer(controller,balance)" (contracts/status/sticker-market/StickerMarket.sol#332)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+INFO:Detectors:
+Reentrancy in StickerMarket.buy (contracts/status/sticker-market/StickerMarket.sol#449-477):
+	External calls:
+	- require(bool,string)(snt.transferFrom(_caller,Controlled(address(snt)).controller(),burned),Bad burn) (contracts/status/sticker-market/StickerMarket.sol#466)
+	- require(bool,string)(snt.transferFrom(_caller,address(this),donate),Bad donate) (contracts/status/sticker-market/StickerMarket.sol#471)
+	- require(bool,string)(snt.transferFrom(_caller,_pack.owner,amount),Bad payment) (contracts/status/sticker-market/StickerMarket.sol#474)
+	State variables written after the call(s):
+	- _ownedTokensPos (contracts/status/sticker-market/StickerMarket.sol#476)
+	- _tokenOwner (contracts/status/sticker-market/StickerMarket.sol#476)
+	- tokenCount (contracts/status/sticker-market/StickerMarket.sol#476)
+	- tokenPackId (contracts/status/sticker-market/StickerMarket.sol#476)
+Reentrancy in StickerMarket.register (contracts/status/sticker-market/StickerMarket.sol#421-444):
+	External calls:
+	- require(bool,string)(snt.transferFrom(_caller,address(this),registerFee),Bad payment) (contracts/status/sticker-market/StickerMarket.sol#434)
+	State variables written after the call(s):
+	- availablePacks (contracts/status/sticker-market/StickerMarket.sol#440)
+	- availablePacksIndex (contracts/status/sticker-market/StickerMarket.sol#440)
+	- packCategoryIndex (contracts/status/sticker-market/StickerMarket.sol#440)
+	- packCount (contracts/status/sticker-market/StickerMarket.sol#437)
+	- packs (contracts/status/sticker-market/StickerMarket.sol#438)
+	- packs (contracts/status/sticker-market/StickerMarket.sol#440)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+INFO:Detectors:
+StickerMarket.purgePack (contracts/status/sticker-market/StickerMarket.sol#237-263) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(_limit <= _category.length,Bad limit) (contracts/status/sticker-market/StickerMarket.sol#246)
+	- i < limit (contracts/status/sticker-market/StickerMarket.sol#254-256)
+	- packs[_packId].category.length == 0 (contracts/status/sticker-market/StickerMarket.sol#258-261)
+	- len > 0 (contracts/status/sticker-market/StickerMarket.sol#251-253)
+StickerMarket.buy (contracts/status/sticker-market/StickerMarket.sol#449-477) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(snt.transferFrom(_caller,Controlled(address(snt)).controller(),burned),Bad burn) (contracts/status/sticker-market/StickerMarket.sol#466)
+	- require(bool,string)(_pack.mintable,Disabled) (contracts/status/sticker-market/StickerMarket.sol#460)
+	- require(bool,string)(snt.transferFrom(_caller,_pack.owner,amount),Bad payment) (contracts/status/sticker-market/StickerMarket.sol#474)
+	- amount > 0 && _pack.donate > 0 (contracts/status/sticker-market/StickerMarket.sol#468-472)
+	- require(bool,string)(amount > 0,Unauthorized) (contracts/status/sticker-market/StickerMarket.sol#462)
+	- amount > 0 && burnRate > 0 (contracts/status/sticker-market/StickerMarket.sol#463-467)
+	- require(bool,string)(snt.transferFrom(_caller,address(this),donate),Bad donate) (contracts/status/sticker-market/StickerMarket.sol#471)
+	- amount > 0 (contracts/status/sticker-market/StickerMarket.sol#473-475)
+	- require(bool,string)(_pack.owner != address(0),Bad pack) (contracts/status/sticker-market/StickerMarket.sol#459)
+StickerMarket.removeAvailablePack (contracts/status/sticker-market/StickerMarket.sol#507-529) uses timestamp for comparisons
+	Dangerous comparisons:
+	- pos2 != packs[_packId].category.length (contracts/status/sticker-market/StickerMarket.sol#521-525)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Detectors:
+Address.isContract uses assembly (contracts/common/Address.sol#14-25)
+	- contracts/common/Address.sol#23-24
+StickerMarket.abiDecodeSig uses assembly (contracts/status/sticker-market/StickerMarket.sol#539-543)
+	- contracts/status/sticker-market/StickerMarket.sol#540-543
+StickerMarket.slice uses assembly (contracts/status/sticker-market/StickerMarket.sol#545-600)
+	- contracts/status/sticker-market/StickerMarket.sol#550-599
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Controlled.changeController (contracts/common/Controlled.sol#19-21) should be declared external
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-as-external
+INFO:Detectors:
+Pragma version ">=0.5.0<0.6.0" allows old versions (contracts/common/Address.sol#1)
+Pragma version ">=0.5.0<0.6.0" allows old versions (contracts/common/Controlled.sol#1)
+Pragma version ">=0.5.0<0.6.0" allows old versions (contracts/common/Introspective.sol#1)
+Pragma version ">=0.5.0<0.6.0" allows old versions (contracts/common/SafeMath.sol#1)
+Pragma version ">=0.5.0<0.6.0" allows old versions (contracts/status/sticker-market/StickerMarket.sol#1)
+Pragma version ">=0.5.0<0.6.0" allows old versions (contracts/token/ApproveAndCallFallBack.sol#1)
+Pragma version ">=0.5.0<0.6.0" allows old versions (contracts/token/ERC20Token.sol#1)
+Pragma version ">=0.5.0<0.6.0" allows old versions (contracts/token/ERC721.sol#1)
+Pragma version ">=0.5.0<0.6.0" allows old versions (contracts/token/ERC721Receiver.sol#2)
+Pragma version ">=0.5.0<0.6.0" allows old versions (contracts/token/NonfungibleToken.sol#1)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Parameter '_newController' of Controlled.changeController (contracts/common/Controlled.sol#19) is not in mixedCase
+Function 'Introspective._registerInterface' (contracts/common/Introspective.sol#50-53) is not in mixedCase
+Parameter '_from' of StickerMarket.receiveApproval (contracts/status/sticker-market/StickerMarket.sol#197) is not in mixedCase
+Parameter '' of StickerMarket.receiveApproval (contracts/status/sticker-market/StickerMarket.sol#198) is not in mixedCase
+Parameter '_token' of StickerMarket.receiveApproval (contracts/status/sticker-market/StickerMarket.sol#199) is not in mixedCase
+Parameter '_data' of StickerMarket.receiveApproval (contracts/status/sticker-market/StickerMarket.sol#200) is not in mixedCase
+Parameter '_snt' of StickerMarket. (contracts/status/sticker-market/StickerMarket.sol#74) is not in mixedCase
+Parameter '_packId' of StickerMarket.buyToken (contracts/status/sticker-market/StickerMarket.sol#90) is not in mixedCase
+Parameter '_destination' of StickerMarket.buyToken (contracts/status/sticker-market/StickerMarket.sol#91) is not in mixedCase
+Parameter '_price' of StickerMarket.registerPack (contracts/status/sticker-market/StickerMarket.sol#110) is not in mixedCase
+Parameter '_donate' of StickerMarket.registerPack (contracts/status/sticker-market/StickerMarket.sol#111) is not in mixedCase
+Parameter '_category' of StickerMarket.registerPack (contracts/status/sticker-market/StickerMarket.sol#112) is not in mixedCase
+Parameter '_owner' of StickerMarket.registerPack (contracts/status/sticker-market/StickerMarket.sol#113) is not in mixedCase
+Parameter '_contenthash' of StickerMarket.registerPack (contracts/status/sticker-market/StickerMarket.sol#114) is not in mixedCase
+Parameter '_packId' of StickerMarket.setPackOwner (contracts/status/sticker-market/StickerMarket.sol#127) is not in mixedCase
+Parameter '_to' of StickerMarket.setPackOwner (contracts/status/sticker-market/StickerMarket.sol#127) is not in mixedCase
+Parameter '_packId' of StickerMarket.setPackPrice (contracts/status/sticker-market/StickerMarket.sol#140) is not in mixedCase
+Parameter '_price' of StickerMarket.setPackPrice (contracts/status/sticker-market/StickerMarket.sol#140) is not in mixedCase
+Parameter '_donate' of StickerMarket.setPackPrice (contracts/status/sticker-market/StickerMarket.sol#140) is not in mixedCase
+Parameter '_packId' of StickerMarket.addPackCategory (contracts/status/sticker-market/StickerMarket.sol#156) is not in mixedCase
+Parameter '_category' of StickerMarket.addPackCategory (contracts/status/sticker-market/StickerMarket.sol#156) is not in mixedCase
+Parameter '_packId' of StickerMarket.removePackCategory (contracts/status/sticker-market/StickerMarket.sol#170) is not in mixedCase
+Parameter '_category' of StickerMarket.removePackCategory (contracts/status/sticker-market/StickerMarket.sol#170) is not in mixedCase
+Parameter '_packId' of StickerMarket.setPackState (contracts/status/sticker-market/StickerMarket.sol#182) is not in mixedCase
+Parameter '_mintable' of StickerMarket.setPackState (contracts/status/sticker-market/StickerMarket.sol#182) is not in mixedCase
+Parameter '_packId' of StickerMarket.setPackContenthash (contracts/status/sticker-market/StickerMarket.sol#226) is not in mixedCase
+Parameter '_contenthash' of StickerMarket.setPackContenthash (contracts/status/sticker-market/StickerMarket.sol#226) is not in mixedCase
+Parameter '_packId' of StickerMarket.purgePack (contracts/status/sticker-market/StickerMarket.sol#237) is not in mixedCase
+Parameter '_limit' of StickerMarket.purgePack (contracts/status/sticker-market/StickerMarket.sol#237) is not in mixedCase
+Parameter '_state' of StickerMarket.setMarketState (contracts/status/sticker-market/StickerMarket.sol#269) is not in mixedCase
+Parameter '_value' of StickerMarket.setRegisterFee (contracts/status/sticker-market/StickerMarket.sol#281) is not in mixedCase
+Parameter '_value' of StickerMarket.setBurnRate (contracts/status/sticker-market/StickerMarket.sol#293) is not in mixedCase
+Parameter '_owner' of StickerMarket.generateToken (contracts/status/sticker-market/StickerMarket.sol#308) is not in mixedCase
+Parameter '_packId' of StickerMarket.generateToken (contracts/status/sticker-market/StickerMarket.sol#308) is not in mixedCase
+Parameter '_token' of StickerMarket.claimTokens (contracts/status/sticker-market/StickerMarket.sol#322) is not in mixedCase
+Parameter '_category' of StickerMarket.getAvailablePacks (contracts/status/sticker-market/StickerMarket.sol#340) is not in mixedCase
+Parameter '_category' of StickerMarket.getCategoryLength (contracts/status/sticker-market/StickerMarket.sol#352) is not in mixedCase
+Parameter '_category' of StickerMarket.getCategoryPack (contracts/status/sticker-market/StickerMarket.sol#364) is not in mixedCase
+Parameter '_index' of StickerMarket.getCategoryPack (contracts/status/sticker-market/StickerMarket.sol#364) is not in mixedCase
+Parameter '_packId' of StickerMarket.getPackData (contracts/status/sticker-market/StickerMarket.sol#375) is not in mixedCase
+Parameter '_tokenId' of StickerMarket.getTokenData (contracts/status/sticker-market/StickerMarket.sol#401) is not in mixedCase
+Parameter '_caller' of StickerMarket.register (contracts/status/sticker-market/StickerMarket.sol#422) is not in mixedCase
+Parameter '_category' of StickerMarket.register (contracts/status/sticker-market/StickerMarket.sol#423) is not in mixedCase
+Parameter '_owner' of StickerMarket.register (contracts/status/sticker-market/StickerMarket.sol#424) is not in mixedCase
+Parameter '_price' of StickerMarket.register (contracts/status/sticker-market/StickerMarket.sol#425) is not in mixedCase
+Parameter '_donate' of StickerMarket.register (contracts/status/sticker-market/StickerMarket.sol#426) is not in mixedCase
+Parameter '_contenthash' of StickerMarket.register (contracts/status/sticker-market/StickerMarket.sol#427) is not in mixedCase
+Parameter '_caller' of StickerMarket.buy (contracts/status/sticker-market/StickerMarket.sol#450) is not in mixedCase
+Parameter '_packId' of StickerMarket.buy (contracts/status/sticker-market/StickerMarket.sol#451) is not in mixedCase
+Parameter '_destination' of StickerMarket.buy (contracts/status/sticker-market/StickerMarket.sol#452) is not in mixedCase
+Parameter '_owner' of StickerMarket.mintStickerPack (contracts/status/sticker-market/StickerMarket.sol#483) is not in mixedCase
+Parameter '_packId' of StickerMarket.mintStickerPack (contracts/status/sticker-market/StickerMarket.sol#484) is not in mixedCase
+Parameter '_packId' of StickerMarket.addAvailablePack (contracts/status/sticker-market/StickerMarket.sol#497) is not in mixedCase
+Parameter '_category' of StickerMarket.addAvailablePack (contracts/status/sticker-market/StickerMarket.sol#497) is not in mixedCase
+Parameter '_packId' of StickerMarket.removeAvailablePack (contracts/status/sticker-market/StickerMarket.sol#507) is not in mixedCase
+Parameter '_category' of StickerMarket.removeAvailablePack (contracts/status/sticker-market/StickerMarket.sol#507) is not in mixedCase
+Parameter '_tokenId' of StickerMarket.getTokenPack (contracts/status/sticker-market/StickerMarket.sol#534) is not in mixedCase
+Parameter '_bytes' of StickerMarket.slice (contracts/status/sticker-market/StickerMarket.sol#545) is not in mixedCase
+Parameter '_start' of StickerMarket.slice (contracts/status/sticker-market/StickerMarket.sol#545) is not in mixedCase
+Parameter '_length' of StickerMarket.slice (contracts/status/sticker-market/StickerMarket.sol#545) is not in mixedCase
+Parameter '_tokenId' of NonfungibleToken.addOwnedTokens (contracts/token/NonfungibleToken.sol#278) is not in mixedCase
+Parameter '_tokenId' of NonfungibleToken.removeOwnedTokens (contracts/token/NonfungibleToken.sol#282) is not in mixedCase
+Constant 'NonfungibleToken._InterfaceId_ERC721' (contracts/token/NonfungibleToken.sol#35) is not in UPPER_CASE_WITH_UNDERSCORES
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Slither:./contracts/status/sticker-market/StickerMarket.sol analyzed (11 contracts), 89 result(s) found

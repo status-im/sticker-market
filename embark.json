@@ -1,0 +1,29 @@
+{
+  "contracts": ["contracts/**"],
+  "app": {
+    "js/dapp.js": ["app/dapp.js"],
+    "index.html": "app/index.html",
+    "images/": ["app/images/**"],
+    "css/bootstrap.min.css": "node_modules/bootstrap/dist/css/bootstrap.min.css"
+  },
+  "buildDir": "dist/",
+  "config": "config/",
+  "versions": {
+    "web3": "1.0.0-beta",
+    "solc": "0.5.4",
+    "ipfs-api": "17.2.4"
+  },
+  "plugins": {
+    "embarkjs-connector-web3": {},
+    "@trailofbits/embark-contract-info": {
+      "flags": ""
+    }
+  },
+  "options": {
+    "solc": {
+      "optimize": true,
+      "optimize-runs": 200
+    }
+  },
+  "generationDir": "embarkArtifacts"
+}
