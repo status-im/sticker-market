@@ -132,6 +132,8 @@ Should be optional for creator to set and edit the price of a sticker pack after
 
 ### Security Concerns
 - Using IPFS to host stickers means reliance on Infura
+- Status has recently deployed a hosted IPFS gateway to ensure pinning.  This is planned to grow into a load-balanced IPFS cluster to long-term support.
+    - It would be useful to decentralize this part, but not sure how
 
 ## Registry Contract
 
