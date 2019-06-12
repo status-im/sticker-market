@@ -209,7 +209,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         bytes4 sig = abiDecodeSig(_data);
         bytes memory cdata = slice(_data,4,_data.length-4);
         if(sig == this.buyToken.selector){
-            require(cdata.length == 64, "Bad data length");
+            require(cdata.length == 96, "Bad data length");
             (uint256 packId, address owner, uint256 price) = abi.decode(cdata, (uint256, address, uint256));
             require(_value == price, "Bad value");
             buy(_from, packId, owner, price);
