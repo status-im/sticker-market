@@ -144,7 +144,7 @@ contract("StickerMarket", function() {
         for(let i = 0; i < registeredPacks.length; i++){
             await TestStatusNetwork.methods.mint(registeredPacks[i].data.price).send({from: packBuyer });
             await MiniMeToken.methods.approve(StickerMarket.address, registeredPacks[i].data.price).send({from: packBuyer });
-            let buy = await StickerMarket.methods.buyToken(registeredPacks[i].id, packBuyer).send({from: packBuyer });
+            let buy = await StickerMarket.methods.buyToken(registeredPacks[i].id, packBuyer, registeredPacks[i].data.price).send({from: packBuyer });
             let tokenId;
             let toArtist = 0;
             let donated = 0;
@@ -182,7 +182,7 @@ contract("StickerMarket", function() {
         for(let i = 0; i < registeredPacks.length; i++){
             
             await TestStatusNetwork.methods.mint(registeredPacks[i].data.price).send({from: packBuyer });
-            const buyCall = StickerMarket.methods.buyToken(registeredPacks[i].id, packBuyer).encodeABI();
+            const buyCall = StickerMarket.methods.buyToken(registeredPacks[i].id, packBuyer, registeredPacks[i].data.price).encodeABI();
             let buy = await MiniMeToken.methods.approveAndCall(StickerMarket.address, registeredPacks[i].data.price, buyCall).send({from: packBuyer });
             let tokenId;
             let toArtist = 0;
@@ -261,7 +261,7 @@ contract("StickerMarket", function() {
         let packId = reg.events.Register.returnValues.packId;
         await TestStatusNetwork.methods.mint("1").send({from: packBuyer });
         await MiniMeToken.methods.approve(StickerMarket.address, "1").send({from: packBuyer });
-        Utils.expectThrow(StickerMarket.methods.buyToken(packId, packBuyer).send({from: packBuyer }));
+        Utils.expectThrow(StickerMarket.methods.buyToken(packId, packBuyer, testPackPrice).send({from: packBuyer }));
         await StickerMarket.methods.purgePack(packId, 0).send();  
     });
 
