@@ -213,7 +213,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
             (uint256 packId, address owner) = abi.decode(cdata, (uint256, address));
             buy(_from, packId, owner);
         } else if(sig == this.registerPack.selector) {
-            require(cdata.length >= 156, "Bad data length");
+            require(cdata.length >= 188, "Bad data length");
             (uint256 price, uint256 donate, bytes4[] memory category, address owner, bytes memory contenthash, uint256 fee) = abi.decode(cdata, (uint256,uint256,bytes4[],address,bytes,uint256));
             require(_value == fee, "Bad fee value");
             register(_from, category, owner, price, donate, contenthash, fee);
