@@ -1,5 +1,6 @@
 pragma solidity >=0.5.0 <0.6.0;
 
+import "../../nft/math/safe-math.sol";
 import "../../nft/tokens/nf-token-enumerable.sol";
 import "../../token/ERC20Token.sol";
 import "../../token/ApproveAndCallFallBack.sol";
@@ -10,6 +11,7 @@ import "../../common/Controlled.sol";
  * StickerMarket allows any address register "StickerPack" which can be sold to any address in form of "StickerPack", an ERC721 token.
  */
 contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack {
+    using SafeMath for uint256;
     event Register(uint256 indexed packId, uint256 dataPrice, bytes _contenthash);
     event Categorized(bytes4 indexed category, uint256 indexed packId);
     event Uncategorized(bytes4 indexed category, uint256 indexed packId);
@@ -536,13 +538,13 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         uint256 amount = _pack.price;
         require(amount > 0, "Unauthorized");
         if(amount > 0 && burnRate > 0) {
-            uint256 burned = (amount * burnRate) / 10000;
-            amount -= burned;
+            uint256 burned = amount.mul(burnRate).div(10000);
+            amount = amount.sub(burned);
             require(snt.transferFrom(_caller, Controlled(address(snt)).controller(), burned), "Bad burn");
         }
         if(amount > 0 && _pack.donate > 0) {
-            uint256 donate = (amount * _pack.donate) / 10000;
-            amount -= donate;
+            uint256 donate = amount.mul(_pack.donate).div(10000);
+            amount = amount.sub(donate);
             require(snt.transferFrom(_caller, controller, donate), "Bad donate");
         } 
         if(amount > 0) {
