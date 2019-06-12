@@ -293,7 +293,9 @@ contract("StickerMarket", function() {
         let packOwner = accounts[1];
         let reg = await StickerMarket.methods.registerPack(testPackPrice, 0, ["0x00000000"], packOwner, testPack).send();
         let packId = reg.events.Register.returnValues.packId;
-        await StickerMarket.methods.setPackPrice(packId, 100, 0).send({from: packOwner});
+        let r = await StickerMarket.methods.setPackPrice(packId, 100, 0).send({from: packOwner});
+        assert.equal(r.events.PriceChanged.returnValues.packId, packId)
+        assert.equal(r.events.PriceChanged.returnValues.dataPrice, 100)
         await StickerMarket.methods.purgePack(packId, 0).send();  
     });
 
@@ -303,7 +305,9 @@ contract("StickerMarket", function() {
         let packOwner = accounts[1];
         let reg = await StickerMarket.methods.registerPack(testPackPrice, 0, ["0x00000000"], packOwner, testPack).send();
         let packId = reg.events.Register.returnValues.packId;
-        await StickerMarket.methods.setPackPrice(packId, 100, 50).send();
+        let r = await StickerMarket.methods.setPackPrice(packId, 100, 50).send();
+        assert.equal(r.events.PriceChanged.returnValues.packId, packId)
+        assert.equal(r.events.PriceChanged.returnValues.dataPrice, 100)
         await StickerMarket.methods.purgePack(packId, 0).send();  
     });
       
