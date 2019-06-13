@@ -66,7 +66,8 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     }
 
     modifier packOwner(uint256 _packId) {
-        require(msg.sender == controller || packs[_packId].owner == msg.sender);
+        address owner = packs[_packId].owner;
+        require((msg.sender == owner) || (owner != address(0) && msg.sender == controller));
         _;
     }
 
