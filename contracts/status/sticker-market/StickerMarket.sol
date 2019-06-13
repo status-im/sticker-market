@@ -1,7 +1,7 @@
 pragma solidity >=0.5.0 <0.6.0;
 
 import "../../nft/math/safe-math.sol";
-import "../../nft/tokens/nf-token-enumerable.sol";
+import "./StickerPack.sol";
 import "../../token/ERC20Token.sol";
 import "../../token/ApproveAndCallFallBack.sol";
 import "../../common/Controlled.sol";
@@ -10,7 +10,7 @@ import "../../common/Controlled.sol";
  * @author Ricardo Guilherme Schmidt (Status Research & Development GmbH) 
  * StickerMarket allows any address register "StickerPack" which can be sold to any address in form of "StickerPack", an ERC721 token.
  */
-contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack {
+contract StickerMarket is Controlled, ApproveAndCallFallBack {
     using SafeMath for uint256;
     event Register(uint256 indexed packId, uint256 dataPrice, bytes _contenthash);
     event PriceChanged(uint256 indexed packId, uint256 dataPrice);
@@ -40,10 +40,10 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     
     //include global var to set burn rate/percentage
     ERC20Token public snt; //payment token
+    StickerPack public stickerPack = new StickerPack();
     mapping(uint256 => Pack) public packs;
-    mapping(uint256 => uint256) public tokenPackId; //packId
     uint256 public packCount; //pack registers
-    uint256 public tokenCount; //tokens buys  
+
 
     //auxilary views
     mapping(bytes4 => uint256[]) private availablePacks; //array of available packs
@@ -431,6 +431,19 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     }
 
     /**
+     * @notice returns token owner
+     * @param _tokenId token being queried
+     * @return token owner
+     */
+    function ownerOf(uint256 _tokenId) 
+        external 
+        view 
+        returns (address) 
+    {
+        return stickerPack.ownerOf(_tokenId);
+    }
+
+    /**
      * @notice returns all data from pack in market
      * @param _packId pack id being queried
      * @return categories, owner, mintable, price, donate and contenthash
@@ -617,9 +630,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         internal 
         returns (uint256 tokenId)
     {
-        tokenId = tokenCount++;
-        tokenPackId[tokenId] = _packId;
-        _mint(_owner, tokenId);
+        return stickerPack.generateToken(_owner, _packId);
     }
     
     /** 
@@ -669,7 +680,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
      * @return Pack memory resolved from _tokenId
      */
     function getTokenPack(uint256 _tokenId) private view returns(Pack memory pack){
-        pack = packs[tokenPackId[_tokenId]];
+        pack = packs[stickerPack.tokenPackId(_tokenId)];
     }
 
     /**
