@@ -2,13 +2,12 @@ pragma solidity >=0.5.0 <0.6.0;
 
 import "../../nft/tokens/nf-token-enumerable.sol";
 import "../../common/Controlled.sol";
-import "../../token/ERC20Token.sol";
+import "../../common/TokenClaimer.sol";
 
 /**
  * @author Ricardo Guilherme Schmidt (Status Research & Development GmbH)
  */
-contract StickerPack is Controlled, NFTokenEnumerable {
-    event ClaimedTokens(address indexed _token, address indexed _controller, uint256 _amount);
+contract StickerPack is Controlled, TokenClaimer, NFTokenEnumerable {
 
     mapping(uint256 => uint256) public tokenPackId; //packId
     uint256 public tokenCount; //tokens buys
@@ -39,17 +38,9 @@ contract StickerPack is Controlled, NFTokenEnumerable {
         external
         onlyController
     {
-        uint256 balance;
-        if (_token == address(0)) {
-            balance = address(this).balance;
-            address(controller).transfer(balance);
-        } else {
-            ERC20Token token = ERC20Token(_token);
-            balance = token.balanceOf(address(this));
-            token.transfer(controller, balance);
-        }
-        emit ClaimedTokens(_token, controller, balance);
+        withdrawBalance(_token, controller);
     }
+
 
 
 }

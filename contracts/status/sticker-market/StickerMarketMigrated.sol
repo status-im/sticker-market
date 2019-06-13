@@ -4,12 +4,13 @@ import "./StickerMarket.sol";
 import "../../token/ERC20Token.sol";
 import "../../token/ApproveAndCallFallBack.sol";
 import "../../common/Controlled.sol";
+import "../../common/TokenClaimer.sol";
 
 /**
  * @author Ricardo Guilherme Schmidt (Status Research & Development GmbH) 
  * StickerMarket allows any address register "StickerPack" which can be sold to any address in form of "StickerPack", an ERC721 token.
  */
-contract StickerMarketMigrated is Controlled, ApproveAndCallFallBack {
+contract StickerMarketMigrated is Controlled, TokenClaimer, ApproveAndCallFallBack {
     event Register(uint256 indexed packId, uint256 dataPrice, bytes _contenthash);
     event Categorized(bytes4 indexed category, uint256 indexed packId);
     event Uncategorized(bytes4 indexed category, uint256 indexed packId);
@@ -316,19 +317,13 @@ contract StickerMarketMigrated is Controlled, ApproveAndCallFallBack {
      * @param _token The address of the token contract that you want to recover
      *  set to 0 in case you want to extract ether.
      */
-    function claimTokens(address _token) 
+    function claimTokens(address _token)
         external
-        onlyController 
+        onlyController
     {
-        if (_token == address(0)) {
-            address(controller).transfer(address(this).balance);
-            return;
-        }
-        ERC20Token token = ERC20Token(_token);
-        uint256 balance = token.balanceOf(address(this));
-        token.transfer(controller, balance);
-        emit ClaimedTokens(_token, controller, balance);
+        withdrawBalance(_token, controller);
     }
+
     
     
     /**

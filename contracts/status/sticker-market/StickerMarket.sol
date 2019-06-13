@@ -5,12 +5,13 @@ import "./StickerPack.sol";
 import "../../token/ERC20Token.sol";
 import "../../token/ApproveAndCallFallBack.sol";
 import "../../common/Controlled.sol";
+import "../../common/TokenClaimer.sol";
 
 /**
  * @author Ricardo Guilherme Schmidt (Status Research & Development GmbH) 
  * StickerMarket allows any address register "StickerPack" which can be sold to any address in form of "StickerPack", an ERC721 token.
  */
-contract StickerMarket is Controlled, ApproveAndCallFallBack {
+contract StickerMarket is Controlled, TokenClaimer, ApproveAndCallFallBack {
     using SafeMath for uint256;
     event Register(uint256 indexed packId, uint256 dataPrice, bytes _contenthash);
     event PriceChanged(uint256 indexed packId, uint256 dataPrice);
@@ -364,16 +365,7 @@ contract StickerMarket is Controlled, ApproveAndCallFallBack {
         external
         onlyController 
     {
-        uint256 balance;
-        if (_token == address(0)) {
-            balance = address(this).balance;
-            address(controller).transfer(balance);
-        } else {
-            ERC20Token token = ERC20Token(_token);
-            balance = token.balanceOf(address(this));
-            token.transfer(controller, balance);
-        }
-        emit ClaimedTokens(_token, controller, balance);
+        withdrawBalance(_token, controller);
     }
     
     /**
