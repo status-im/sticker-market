@@ -106,6 +106,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
      * @param _category listing category
      * @param _owner address of the beneficiary of buys
      * @param _contenthash EIP1577 pack contenthash for listings
+     * @param _fee Fee msg.sender agrees to pay for this registration
      * @return packId Market position of Sticker Pack data.
      */
     function registerPack(
@@ -113,12 +114,13 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         uint256 _donate,
         bytes4[] calldata _category, 
         address _owner,
-        bytes calldata _contenthash
+        bytes calldata _contenthash,
+        uint256 _fee
     ) 
         external  
         returns(uint256 packId)
     {
-        packId = register(msg.sender, _category, _owner, _price, _donate, _contenthash);
+        packId = register(msg.sender, _category, _owner, _price, _donate, _contenthash, _fee);
     }
 
     /**
@@ -194,6 +196,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
      * @param _from account calling "approve and buy" 
      * @param _value must be exactly SNT contract
      * @param _token must be exactly SNT contract
+     * @param _value must be exactly whats being consumed
      * @param _data abi encoded call 
      */
     function receiveApproval(
@@ -211,12 +214,13 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         if(sig == this.buyToken.selector){
             require(cdata.length == 96, "Bad data length");
             (uint256 packId, address owner, uint256 price) = abi.decode(cdata, (uint256, address, uint256));
-            require(_value == price, "Bad value");
+            require(_value == price, "Bad price value");
             buy(_from, packId, owner, price);
-        } else if(sig == bytes4(keccak256("registerPack(uint256,uint256,bytes4[],address,bytes)"))) {
-            require(cdata.length >= 156, "Bad data length");
-            (uint256 _price, uint256 _donate, bytes4[] memory _category, address _owner, bytes memory _contenthash) = abi.decode(cdata, (uint256,uint256,bytes4[],address,bytes));
-            register(_from, _category, _owner, _price, _donate, _contenthash);
+        } else if(sig == this.registerPack.selector) {
+            require(cdata.length >= 188, "Bad data length");
+            (uint256 price, uint256 donate, bytes4[] memory category, address owner, bytes memory contenthash, uint256 fee) = abi.decode(cdata, (uint256,uint256,bytes4[],address,bytes,uint256));
+            require(_value == fee, "Bad fee value");
+            register(_from, category, owner, price, donate, contenthash, fee);
         } else {
             revert("Bad call");
         }
@@ -487,12 +491,14 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         address _owner,
         uint256 _price,
         uint256 _donate,
-        bytes memory _contenthash
+        bytes memory _contenthash,
+        uint256 _fee
     ) 
         internal 
         marketManagement
         returns(uint256 packId) 
     {
+        require(_fee == registerFee, "Unexpected fee");
         if(registerFee > 0){
             require(snt.transferFrom(_caller, controller, registerFee), "Bad payment");
         }
