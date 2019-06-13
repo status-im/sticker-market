@@ -11,6 +11,7 @@ import "../../common/Controlled.sol";
  */
 contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack {
     event Register(uint256 indexed packId, uint256 dataPrice, bytes _contenthash);
+    event PriceChanged(uint256 indexed packId, uint256 dataPrice);
     event Categorized(bytes4 indexed category, uint256 indexed packId);
     event Uncategorized(bytes4 indexed category, uint256 indexed packId);
     event Unregister(uint256 indexed packId);
@@ -147,6 +148,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         packOwner(_packId)
     {
         require(_donate <= 10000, "Bad argument, _donate cannot be more then 100.00%");
+        emit PriceChanged(_packId, _price);
         packs[_packId].price = _price;
         packs[_packId].donate = _donate;
     }
