@@ -51,7 +51,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     mapping(uint256 => mapping(bytes4 => uint256)) private packCategoryIndex;
     
     /**
-     * @dev can only be called when market is open on by controller on Controlled state
+     * @dev can only be called when market is open or by controller on Controlled state
      */
     modifier marketManagement {
         require(state == State.Open || (msg.sender == controller && state == State.Controlled), "Market Disabled");
