@@ -126,17 +126,6 @@ contract("StickerType", function() {
         
     });
 
-    it("should change ownership of pack by user", async function() {;
-        let testPack = "0x0000000000000000000000000000000000000000000000000000000000000000";
-        let testPackPrice = "0";
-        let packOwner = accounts[1];
-        let packOwner2 = accounts[2];
-        let reg = await StickerType.methods.generatePack(testPackPrice, 0, ["0x00000000"], packOwner, testPack).send();
-        let packId = reg.events.Register.returnValues.packId;
-        await StickerType.methods.setPackOwner(packId, packOwner2).send({from: packOwner});
-        await StickerType.methods.purgePack(packId, 0).send();  
-    });
-        
     it("should change price of pack by user", async function() {
         let testPack = "0x0000000000000000000000000000000000000000000000000000000000000000";
         let testPackPrice = "0";
@@ -159,18 +148,6 @@ contract("StickerType", function() {
         await StickerType.methods.purgePack(packId, 0).send();  
     });
 
-
-    it("should change ownership of pack by controller", async function() {
-        let testPack = "0x0000000000000000000000000000000000000000000000000000000000000000";
-        let testPackPrice = "0";
-        let packOwner = accounts[1];
-        let packOwner2 = accounts[2];
-        let reg = await StickerType.methods.generatePack(testPackPrice, 0, ["0x00000000"], packOwner, testPack).send();
-        let packId = reg.events.Register.returnValues.packId;
-        await StickerType.methods.setPackOwner(packId, packOwner2).send();
-        await StickerType.methods.purgePack(packId, 0).send();  
-    });
-    
     it("should change price of pack by controller", async function() {
         let testPack = "0x0000000000000000000000000000000000000000000000000000000000000000";
         let testPackPrice = "0";

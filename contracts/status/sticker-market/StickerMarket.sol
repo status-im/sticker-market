@@ -58,9 +58,11 @@ contract StickerMarket is Controlled, TokenClaimer, ApproveAndCallFallBack {
         public
     { 
         require(address(_snt) != address(0), "Bad _snt parameter");
+        require(address(_stickerPack) != address(0), "Bad _stickerPack parameter");
+        require(address(_stickerType) != address(0), "Bad _stickerType parameter");
         snt = _snt;
-        stickerPack = address(_stickerPack) != address(0) ? _stickerPack : new StickerPack();
-        stickerType = address(_stickerType) != address(0) ? _stickerType : new StickerType();
+        stickerPack = _stickerPack;
+        stickerType = _stickerType;
     }
 
     /** 

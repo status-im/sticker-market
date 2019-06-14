@@ -20,8 +20,18 @@ config({
         "await TestStatusNetwork.methods.setOpen(true).send()",
       ]
     },
+    "StickerPack": {
+        "args": []
+    },
+    "StickerType": {
+        "args": []
+    },
     "StickerMarket": {
-        "args": ["$MiniMeToken", "0x0", "0x0"]
+        "args": ["$MiniMeToken", "$StickerPack", "$StickerType"],
+        "onDeploy": [
+            "await StickerPack.methods.changeController(StickerMarket.address).send()",
+            "await StickerType.methods.changeController(StickerMarket.address).send()",
+        ]
     },
     "StickerMarketMigrated": {
         "args": ["$StickerMarket"]

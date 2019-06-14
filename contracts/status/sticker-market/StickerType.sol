@@ -1,6 +1,7 @@
 pragma solidity >=0.5.0 <0.6.0;
 
 import "../../nft/math/safe-math.sol";
+import "../../nft/tokens/nf-token-enumerable.sol";
 import "../../common/Controlled.sol";
 import "../../common/TokenClaimer.sol";
 
@@ -8,7 +9,7 @@ import "../../common/TokenClaimer.sol";
  * @author Ricardo Guilherme Schmidt (Status Research & Development GmbH)
  * StickerMarket allows any address register "StickerPack" which can be sold to any address in form of "StickerPack", an ERC721 token.
  */
-contract StickerType is Controlled, TokenClaimer {
+contract StickerType is Controlled, TokenClaimer, NFTokenEnumerable {
     using SafeMath for uint256;
     event Register(uint256 indexed packId, uint256 dataPrice, bytes _contenthash);
     event PriceChanged(uint256 indexed packId, uint256 dataPrice);
@@ -18,7 +19,6 @@ contract StickerType is Controlled, TokenClaimer {
 
     struct Pack {
         bytes4[] category;
-        address owner; //beneficiary of "buy"
         bool mintable;
         uint256 timestamp;
         uint256 price; //in "wei"
@@ -42,7 +42,7 @@ contract StickerType is Controlled, TokenClaimer {
      * Can only be called by the pack owner, or by the controller if pack exists.
      */
     modifier packOwner(uint256 _packId) {
-        address owner = packs[_packId].owner;
+        address owner = idToOwner[_packId];
         require((msg.sender == owner) || (owner != address(0) && msg.sender == controller), "Unauthorized");
         _;
     }
@@ -69,7 +69,8 @@ contract StickerType is Controlled, TokenClaimer {
     {
         require(_donate <= 10000, "Bad argument, _donate cannot be more then 100.00%");
         packId = packCount++;
-        packs[packId] = Pack(new bytes4[](0), _owner, true, block.timestamp, _price, _donate, _contenthash);
+        _mint(_owner, packId);
+        packs[packId] = Pack(new bytes4[](0), true, block.timestamp, _price, _donate, _contenthash);
         emit Register(packId, _price, _contenthash);
         for(uint i = 0;i < _category.length; i++){
             addAvailablePack(packId, _category[i]);
@@ -132,18 +133,6 @@ contract StickerType is Controlled, TokenClaimer {
         onlyController
     {
         withdrawBalance(_token, controller);
-    }
-
-    /**
-     * @notice changes beneficiary of `_packId`, can only be called when market is open
-     * @param _packId which market position is being transfered
-     * @param _to new beneficiary
-     */
-    function setPackOwner(uint256 _packId, address _to)
-        external
-        packOwner(_packId)
-    {
-        packs[_packId].owner = _to;
     }
 
     /**
@@ -239,33 +228,6 @@ contract StickerType is Controlled, TokenClaimer {
     }
 
     /**
-     * @notice returns pack ownership for migrated contract
-     * @param _packId pack id being queried
-     * @return true if packId owner matches
-     */
-    function getPackOwner(uint256 _packId)
-        external
-        view
-        returns (address)
-    {
-        return packs[_packId].owner;
-    }
-
-    /**
-     * @notice returns pack ownership for migrated contract
-     * @param _packId pack id being queried
-     * @param _owner address to check if is owner
-     * @return true if packId owner matches
-     */
-    function isPackOwner(uint256 _packId, address _owner)
-        external
-        view
-        returns (bool)
-    {
-        return packs[_packId].owner == _owner;
-    }
-
-    /**
      * @notice returns all data from pack in market
      * @param _packId pack id being queried
      * @return categories, owner, mintable, price, donate and contenthash
@@ -285,7 +247,7 @@ contract StickerType is Controlled, TokenClaimer {
         Pack memory pack = packs[_packId];
         return (
             pack.category,
-            pack.owner,
+            idToOwner[_packId],
             pack.mintable,
             pack.timestamp,
             pack.price,
@@ -332,7 +294,7 @@ contract StickerType is Controlled, TokenClaimer {
     {
         Pack memory pack = packs[_packId];
         return (
-            pack.owner,
+            idToOwner[_packId],
             pack.mintable,
             pack.price,
             pack.donate
