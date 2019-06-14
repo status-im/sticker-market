@@ -422,12 +422,10 @@ contract StickerMarket is Controlled, TokenClaimer, ApproveAndCallFallBack {
     }
 
 
- /** For ABI purposes */
-    event Register(uint256 indexed packId, uint256 dataPrice, bytes _contenthash);
-    event PriceChanged(uint256 indexed packId, uint256 dataPrice);
-    event Categorized(bytes4 indexed category, uint256 indexed packId);
-    event Uncategorized(bytes4 indexed category, uint256 indexed packId);
-    event Unregister(uint256 indexed packId);
+    // For ABI/web3.js purposes
+    // fired by StickerType
+    event Register(uint256 indexed packId, uint256 dataPrice, bytes contenthash);
+    // fired by StickerPack and MiniMeToken
       event Transfer(
         address indexed from,
         address indexed to,
