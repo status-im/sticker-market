@@ -1,5 +1,6 @@
 pragma solidity >=0.5.0 <0.6.0;
 
+import "../../nft/math/safe-math.sol";
 import "../../nft/tokens/nf-token-enumerable.sol";
 import "../../token/ERC20Token.sol";
 import "../../token/ApproveAndCallFallBack.sol";
@@ -10,7 +11,9 @@ import "../../common/Controlled.sol";
  * StickerMarket allows any address register "StickerPack" which can be sold to any address in form of "StickerPack", an ERC721 token.
  */
 contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack {
+    using SafeMath for uint256;
     event Register(uint256 indexed packId, uint256 dataPrice, bytes _contenthash);
+    event PriceChanged(uint256 indexed packId, uint256 dataPrice);
     event Categorized(bytes4 indexed category, uint256 indexed packId);
     event Uncategorized(bytes4 indexed category, uint256 indexed packId);
     event Unregister(uint256 indexed packId);
@@ -27,7 +30,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         bool mintable; 
         uint256 timestamp;
         uint256 price; //in "wei"
-        uint256 donate; //in "wei"
+        uint256 donate; //in "percent"
         bytes contenthash;
     }
 
@@ -46,8 +49,9 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     mapping(bytes4 => uint256[]) private availablePacks; //array of available packs
     mapping(bytes4 => mapping(uint256 => uint256)) private availablePacksIndex; //position on array of available packs
     mapping(uint256 => mapping(bytes4 => uint256)) private packCategoryIndex;
+    
     /**
-     * @dev can only be called when market is open
+     * @dev can only be called when market is open or by controller on Controlled state
      */
     modifier marketManagement {
         require(state == State.Open || (msg.sender == controller && state == State.Controlled), "Market Disabled");
@@ -55,15 +59,19 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     }
 
     /**
-     * @dev can only be called when market is open
+     * @dev can only be called when market is open or buy-only state.
      */
     modifier marketSell {
         require(state == State.Open || state == State.BuyOnly || (msg.sender == controller && state == State.Controlled), "Market Disabled");
         _;
     }
 
+    /**
+     * Can only be called by the pack owner, or by the controller if pack exists. 
+     */
     modifier packOwner(uint256 _packId) {
-        require(msg.sender == controller || packs[_packId].owner == msg.sender);
+        address owner = packs[_packId].owner;
+        require((msg.sender == owner) || (owner != address(0) && msg.sender == controller));
         _;
     }
 
@@ -84,26 +92,29 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
      * @notice buy a pack from market pack owner, including a StickerPack's token in msg.sender account with same metadata of `_packId` 
      * @param _packId id of market pack 
      * @param _destination owner of token being brought
+     * @param _price agreed price 
      * @return tokenId generated StickerPack token 
      */
     function buyToken(
         uint256 _packId,
-        address _destination
+        address _destination,
+        uint256 _price
     ) 
         external  
         returns (uint256 tokenId)
     {
-        return buy(msg.sender, _packId, _destination);
+        return buy(msg.sender, _packId, _destination, _price);
     }
 
     /** 
      * @dev emits StickerMarket.Register(`packId`, `_urlHash`, `_price`, `_contenthash`)
      * @notice Registers to sell a sticker pack 
-     * @param _price cost in wei to users minting with _urlHash metadata
-     * @param _donate optional amount of `_price` that is donated to StickerMarket at every buy
+     * @param _price cost in wei to users minting this pack
+     * @param _donate value between 0-10000 representing percentage of `_price` that is donated to StickerMarket at every buy
      * @param _category listing category
      * @param _owner address of the beneficiary of buys
      * @param _contenthash EIP1577 pack contenthash for listings
+     * @param _fee Fee msg.sender agrees to pay for this registration
      * @return packId Market position of Sticker Pack data.
      */
     function registerPack(
@@ -111,12 +122,13 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         uint256 _donate,
         bytes4[] calldata _category, 
         address _owner,
-        bytes calldata _contenthash
+        bytes calldata _contenthash,
+        uint256 _fee
     ) 
         external  
         returns(uint256 packId)
     {
-        packId = register(msg.sender, _category, _owner, _price, _donate, _contenthash);
+        packId = register(msg.sender, _category, _owner, _price, _donate, _contenthash, _fee);
     }
 
     /**
@@ -134,8 +146,9 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
 
     /**
      * @notice changes price of `_packId`, can only be called when market is open
-     * @param _packId which market position is being transfered
-     * @param _price new value
+     * @param _packId pack id changing price settings
+     * @param _price cost in wei to users minting this pack
+     * @param _donate value between 0-10000 representing percentage of `_price` that is donated to StickerMarket at every buy
      */
     function setPackPrice(uint256 _packId, uint256 _price, uint256 _donate) 
         external 
@@ -143,16 +156,16 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         packOwner(_packId)
     {
         require(_donate <= 10000, "Bad argument, _donate cannot be more then 100.00%");
+        emit PriceChanged(_packId, _price);
         packs[_packId].price = _price;
         packs[_packId].donate = _donate;
     }
 
     /**
-     * @notice changes caregory of `_packId`, can only be called when market is open
-     * @param _packId which market position is being transfered
-     * @param _category new category
+     * @notice add caregory in `_packId`, can only be called when market is open
+     * @param _packId pack adding category
+     * @param _category category to list
      */
-
     function addPackCategory(uint256 _packId, bytes4 _category)
         external 
         marketManagement 
@@ -162,11 +175,10 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     }
 
     /**
-     * @notice changes caregory of `_packId`, can only be called when market is open
-     * @param _packId which market position is being transfered
+     * @notice remove caregory in `_packId`, can only be called when market is open
+     * @param _packId pack removing category
      * @param _category category to unlist
      */
-
     function removePackCategory(uint256 _packId, bytes4 _category)
         external 
         marketManagement 
@@ -176,8 +188,9 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     }
     
     /**
-     * @notice 
+     * @notice Changes if pack is enabled for sell
      * @param _packId position edit
+     * @param _mintable true to enable sell
      */
     function setPackState(uint256 _packId, bool _mintable) 
         external 
@@ -190,12 +203,13 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     /**
      * @notice MiniMeToken ApproveAndCallFallBack forwarder for registerPack and buyToken
      * @param _from account calling "approve and buy" 
+     * @param _value must be exactly whats being consumed     
      * @param _token must be exactly SNT contract
      * @param _data abi encoded call 
      */
     function receiveApproval(
         address _from,
-        uint256,
+        uint256 _value,
         address _token,
         bytes calldata _data
     ) 
@@ -205,14 +219,16 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         require(_token == address(msg.sender), "Bad call");
         bytes4 sig = abiDecodeSig(_data);
         bytes memory cdata = slice(_data,4,_data.length-4);
-        if(sig == bytes4(keccak256("buyToken(uint256,address)"))){
-            require(cdata.length == 64, "Bad data length");
-            (uint256 packId, address owner) = abi.decode(cdata, (uint256, address));
-            buy(_from, packId, owner);
-        } else if(sig == bytes4(keccak256("registerPack(uint256,uint256,bytes4[],address,bytes)"))) {
-            require(cdata.length >= 156, "Bad data length");
-            (uint256 _price, uint256 _donate, bytes4[] memory _category, address _owner, bytes memory _contenthash) = abi.decode(cdata, (uint256,uint256,bytes4[],address,bytes));
-            register(_from, _category, _owner, _price, _donate, _contenthash);
+        if(sig == this.buyToken.selector){
+            require(cdata.length == 96, "Bad data length");
+            (uint256 packId, address owner, uint256 price) = abi.decode(cdata, (uint256, address, uint256));
+            require(_value == price, "Bad price value");
+            buy(_from, packId, owner, price);
+        } else if(sig == this.registerPack.selector) {
+            require(cdata.length >= 188, "Bad data length");
+            (uint256 price, uint256 donate, bytes4[] memory category, address owner, bytes memory contenthash, uint256 fee) = abi.decode(cdata, (uint256,uint256,bytes4[],address,bytes,uint256));
+            require(_value == fee, "Bad fee value");
+            register(_from, category, owner, price, donate, contenthash, fee);
         } else {
             revert("Bad call");
         }
@@ -231,8 +247,9 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     }
     
     /**
-     * @notice removes all market data about a marketed pack, can only be called by listing owner or market controller, and when market is open
+     * @notice removes all market data about a marketed pack, can only be called by market controller
      * @param _packId position to be deleted
+     * @param _limit limit of categories to cleanup
      */
     function purgePack(uint256 _packId, uint256 _limit)
         external
@@ -276,7 +293,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
 
     /**
      * @notice changes register fee, only controller can call.
-     * @param _value new register fee
+     * @param _value total SNT cost of registration
      */
     function setRegisterFee(uint256 _value)
         external
@@ -287,8 +304,8 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     }
 
     /**
-     * @notice changes burn rate, only controller can call.
-     * @param _value new burn rate
+     * @notice changes burn rate percentage, only controller can call.
+     * @param _value new value between 0 and 10000
      */
     function setBurnRate(uint256 _value)
         external
@@ -361,6 +378,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     
     /**
      * @notice read available market ids in a category (might be slow)
+     * @param _category listing category
      * @return array of market id registered
      */
     function getAvailablePacks(bytes4 _category) 
@@ -373,7 +391,8 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
 
     /**
      * @notice count total packs in a category
-     * @return lenght
+     * @param _category listing category
+     * @return total number of packs in category
      */
     function getCategoryLength(bytes4 _category) 
         external 
@@ -384,8 +403,10 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     }
 
     /**
-     * @notice read packId of a category index
-     * @return packId
+     * @notice read a packId in the category list at a specific index
+     * @param _category listing category 
+     * @param _index index 
+     * @return packId on index
      */
     function getCategoryPack(bytes4 _category, uint256 _index) 
         external 
@@ -397,6 +418,9 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     
     /**
      * @notice returns pack ownership for migrated contract
+     * @param _packId pack id being queried
+     * @param _owner address to check if is owner
+     * @return true if packId owner matches
      */
     function isPackOwner(uint256 _packId, address _owner) 
         external 
@@ -408,6 +432,8 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
 
     /**
      * @notice returns all data from pack in market
+     * @param _packId pack id being queried
+     * @return categories, owner, mintable, price, donate and contenthash
      */
     function getPackData(uint256 _packId) 
         external 
@@ -434,6 +460,8 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
 
     /**
      * @notice returns payment data for migrated contract
+     * @param _packId pack id being queried
+     * @return owner, mintable, price and donate
      */
     function getPaymentData(uint256 _packId) 
         external 
@@ -455,7 +483,9 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     }
 
     /**
-     * @notice returns relevant token data
+     * @notice returns pack data of token
+     * @param _tokenId user token being queried
+     * @return categories, registration time and contenthash
      */
     function getTokenData(uint256 _tokenId) 
         external 
@@ -476,6 +506,14 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
 
     /** 
      * @dev charges registerFee and register new pack to owner
+     * @param _caller payment account
+     * @param _category listing category
+     * @param _owner address of the beneficiary of buys
+     * @param _price cost in wei to users minting this pack
+     * @param _donate value between 0-10000 representing percentage of `_price` that is donated to StickerMarket at every buy
+     * @param _contenthash EIP1577 pack contenthash for listings
+     * @param _fee Fee msg.sender agrees to pay for this registrion
+     * @return created packId
      */
     function register(
         address _caller,
@@ -483,21 +521,28 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         address _owner,
         uint256 _price,
         uint256 _donate,
-        bytes memory _contenthash
+        bytes memory _contenthash,
+        uint256 _fee
     ) 
         internal 
         marketManagement
         returns(uint256 packId) 
     {
+        require(_fee == registerFee, "Unexpected fee");
         if(registerFee > 0){
             require(snt.transferFrom(_caller, controller, registerFee), "Bad payment");
         }
-        require(_donate <= 10000, "Bad argument, _donate cannot be more then 100.00%");
         packId = register(_category, _owner, _price, _donate, _contenthash);
-    
     }
+
     /** 
      * @dev register new pack to owner
+     * @param _category listing category
+     * @param _owner address of the beneficiary of buys
+     * @param _price cost in wei to users minting this pack
+     * @param _donate value between 0-10000 representing percentage of `_price` that is donated to StickerMarket at every buy
+     * @param _contenthash EIP1577 pack contenthash for listingshash for listings
+     * @return created packId
      */
     function register(
         bytes4[] memory _category,
@@ -510,6 +555,7 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         marketManagement
         returns(uint256 packId) 
     {
+        require(_donate <= 10000, "Bad argument, _donate cannot be more then 100.00%");
         packId = packCount++;
         packs[packId] = Pack(new bytes4[](0), _owner, true, block.timestamp, _price, _donate, _contenthash);
         emit Register(packId, _price, _contenthash);
@@ -520,11 +566,17 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     
     /** 
      * @dev transfer SNT from buyer to pack owner and mint sticker pack token 
+     * @param _caller payment account
+     * @param _packId id of market pack 
+     * @param _destination owner of token being brought
+     * @param _price agreed price 
+     * @return created tokenId
      */
     function buy(
         address _caller,
         uint256 _packId,
-        address _destination
+        address _destination,
+        uint256 _price
     ) 
         internal 
         marketSell
@@ -534,15 +586,16 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
         require(_pack.owner != address(0), "Bad pack");
         require(_pack.mintable, "Disabled");
         uint256 amount = _pack.price;
+        require(_price == amount, "Wrong price");
         require(amount > 0, "Unauthorized");
         if(amount > 0 && burnRate > 0) {
-            uint256 burned = (amount * burnRate) / 10000;
-            amount -= burned;
+            uint256 burned = amount.mul(burnRate).div(10000);
+            amount = amount.sub(burned);
             require(snt.transferFrom(_caller, Controlled(address(snt)).controller(), burned), "Bad burn");
         }
         if(amount > 0 && _pack.donate > 0) {
-            uint256 donate = (amount * _pack.donate) / 10000;
-            amount -= donate;
+            uint256 donate = amount.mul(_pack.donate).div(10000);
+            amount = amount.sub(donate);
             require(snt.transferFrom(_caller, controller, donate), "Bad donate");
         } 
         if(amount > 0) {
@@ -553,6 +606,9 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     
     /**
      * @dev creates new NFT
+     * @param _owner beneficiary
+     * @param _packId pack minted
+     * @return created tokenId
      */
     function mintStickerPack(
         address _owner,
@@ -568,6 +624,8 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     
     /** 
      * @dev adds id from "available list" 
+     * @param _packId altered pack
+     * @param _category listing category
      */
     function addAvailablePack(uint256 _packId, bytes4 _category) private {
         require(packCategoryIndex[_packId][_category] == 0, "Duplicate categorization");
@@ -578,6 +636,8 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
     
     /** 
      * @dev remove id from "available list" 
+     * @param _packId altered pack
+     * @param _category listing category
      */
     function removeAvailablePack(uint256 _packId, bytes4 _category) private {
         uint pos = availablePacksIndex[_category][_packId];
@@ -605,18 +665,31 @@ contract StickerMarket is Controlled, NFTokenEnumerable, ApproveAndCallFallBack 
 
     /**
      * @dev reads token pack data
+     * @param _tokenId user token being queried
+     * @return Pack memory resolved from _tokenId
      */
     function getTokenPack(uint256 _tokenId) private view returns(Pack memory pack){
         pack = packs[tokenPackId[_tokenId]];
     }
 
-
+    /**
+     * @dev decodes sig of abi encoded call
+     * @param _data abi encoded data
+     * @return sig (first 4 bytes)
+     */
     function abiDecodeSig(bytes memory _data) private pure returns(bytes4 sig){
         assembly {
             sig := mload(add(_data, add(0x20, 0)))
         }
     }
 
+    /**
+     * @dev get a slice of byte array
+     * @param _bytes source
+     * @param _start pointer
+     * @param _length size to read
+     * @return sliced bytes
+     */
     function slice(bytes memory _bytes, uint _start, uint _length) private pure returns (bytes memory) {
         require(_bytes.length >= (_start + _length));
 
