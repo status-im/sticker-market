@@ -42,7 +42,7 @@ contract StickerType is Controlled, TokenClaimer, ERC721Enumerable {
      * Can only be called by the pack owner, or by the controller if pack exists.
      */
     modifier packOwner(uint256 _packId) {
-        address owner = idToOwner[_packId];
+        address owner = ownerOf(_packId);
         require((msg.sender == owner) || (owner != address(0) && msg.sender == controller), "Unauthorized");
         _;
     }
@@ -247,7 +247,7 @@ contract StickerType is Controlled, TokenClaimer, ERC721Enumerable {
         Pack memory pack = packs[_packId];
         return (
             pack.category,
-            idToOwner[_packId],
+            ownerOf(_packId),
             pack.mintable,
             pack.timestamp,
             pack.price,
@@ -294,7 +294,7 @@ contract StickerType is Controlled, TokenClaimer, ERC721Enumerable {
     {
         Pack memory pack = packs[_packId];
         return (
-            idToOwner[_packId],
+            ownerOf(_packId),
             pack.mintable,
             pack.price,
             pack.donate
