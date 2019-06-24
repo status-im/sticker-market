@@ -1,7 +1,7 @@
 pragma solidity >=0.5.0 <0.6.0;
 
-import "../../nft/math/safe-math.sol";
-import "../../nft/tokens/nf-token-enumerable.sol";
+import "../../openzeppelin/math/SafeMath.sol";
+import "../../openzeppelin/token/ERC721/ERC721Enumerable.sol";
 import "../../common/Controlled.sol";
 import "../../common/TokenClaimer.sol";
 
@@ -9,7 +9,7 @@ import "../../common/TokenClaimer.sol";
  * @author Ricardo Guilherme Schmidt (Status Research & Development GmbH)
  * StickerMarket allows any address register "StickerPack" which can be sold to any address in form of "StickerPack", an ERC721 token.
  */
-contract StickerType is Controlled, TokenClaimer, NFTokenEnumerable {
+contract StickerType is Controlled, TokenClaimer, ERC721Enumerable {
     using SafeMath for uint256;
     event Register(uint256 indexed packId, uint256 dataPrice, bytes _contenthash);
     event PriceChanged(uint256 indexed packId, uint256 dataPrice);
@@ -42,7 +42,7 @@ contract StickerType is Controlled, TokenClaimer, NFTokenEnumerable {
      * Can only be called by the pack owner, or by the controller if pack exists.
      */
     modifier packOwner(uint256 _packId) {
-        address owner = idToOwner[_packId];
+        address owner = ownerOf(_packId);
         require((msg.sender == owner) || (owner != address(0) && msg.sender == controller), "Unauthorized");
         _;
     }
@@ -247,7 +247,7 @@ contract StickerType is Controlled, TokenClaimer, NFTokenEnumerable {
         Pack memory pack = packs[_packId];
         return (
             pack.category,
-            idToOwner[_packId],
+            ownerOf(_packId),
             pack.mintable,
             pack.timestamp,
             pack.price,
@@ -294,7 +294,7 @@ contract StickerType is Controlled, TokenClaimer, NFTokenEnumerable {
     {
         Pack memory pack = packs[_packId];
         return (
-            idToOwner[_packId],
+            ownerOf(_packId),
             pack.mintable,
             pack.price,
             pack.donate

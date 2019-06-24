@@ -1,13 +1,13 @@
 pragma solidity >=0.5.0 <0.6.0;
 
-import "../../nft/tokens/nf-token-enumerable.sol";
+import "../../openzeppelin/token/ERC721/ERC721Enumerable.sol";
 import "../../common/Controlled.sol";
 import "../../common/TokenClaimer.sol";
 
 /**
  * @author Ricardo Guilherme Schmidt (Status Research & Development GmbH)
  */
-contract StickerPack is Controlled, TokenClaimer, NFTokenEnumerable {
+contract StickerPack is Controlled, TokenClaimer, ERC721Enumerable {
 
     mapping(uint256 => uint256) public tokenPackId; //packId
     uint256 public tokenCount; //tokens buys
