@@ -104,6 +104,7 @@ contract StickerType is Controlled, TokenClaimer, ERC721Enumerable {
         }
 
         if(packs[_packId].category.length == 0){
+            _burn(ownerOf(_packId), _packId);
             delete packs[_packId];
             emit Unregister(_packId);
         }
