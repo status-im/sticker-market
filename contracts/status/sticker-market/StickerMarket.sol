@@ -205,8 +205,9 @@ contract StickerMarket is Controlled, TokenClaimer, ApproveAndCallFallBack {
     }
 
     /**
-     * @notice removes all market data about a marketed pack, can only be called by listing owner or market controller, and when market is open
-     * @param _packId position to be deleted
+     * @notice removes all market data about a marketed pack, can only be called by market controller
+     * @param _packId pack being purged
+     * @param _limit limits categories being purged
      */
     function purgePack(uint256 _packId, uint256 _limit)
         external
