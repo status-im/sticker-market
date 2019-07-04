@@ -29,9 +29,19 @@ module.exports = {
           "await StatusRoot.methods.setOpen(true).send()",
         ]
       },
+      StickerPack: {
+        args: []
+      },
+      StickerType: {
+        args: []
+      },
       StickerMarket: {
-        args: ["$MiniMeToken"]
-      }
+        args: ["$MiniMeToken", "$StickerPack", "$StickerType"],
+        onDeploy: [
+          "await StickerPack.methods.changeController(StickerMarket.address).send()",
+          "await StickerType.methods.changeController(StickerMarket.address).send()",
+        ]
+      },
     }
   },
 
