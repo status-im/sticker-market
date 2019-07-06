@@ -11,8 +11,10 @@ import "../../common/TokenClaimer.sol";
  */
 contract StickerType is Controlled, TokenClaimer, ERC721Enumerable {
     using SafeMath for uint256;
-    event Register(uint256 indexed packId, uint256 dataPrice, bytes _contenthash);
+    event Register(uint256 indexed packId, uint256 dataPrice, bytes contenthash, bool mintable);
     event PriceChanged(uint256 indexed packId, uint256 dataPrice);
+    event MintabilityChanged(uint256 indexed packId, bool mintable);
+    event ContenthashChanged(uint256 indexed packid, bytes contenthash);
     event Categorized(bytes4 indexed category, uint256 indexed packId);
     event Uncategorized(bytes4 indexed category, uint256 indexed packId);
     event Unregister(uint256 indexed packId);
@@ -71,7 +73,7 @@ contract StickerType is Controlled, TokenClaimer, ERC721Enumerable {
         packId = packCount++;
         _mint(_owner, packId);
         packs[packId] = Pack(new bytes4[](0), true, block.timestamp, _price, _donate, _contenthash);
-        emit Register(packId, _price, _contenthash);
+        emit Register(packId, _price, _contenthash, true);
         for(uint i = 0;i < _category.length; i++){
             addAvailablePack(packId, _category[i]);
         }
@@ -120,6 +122,7 @@ contract StickerType is Controlled, TokenClaimer, ERC721Enumerable {
         external
         onlyController
     {
+        emit ContenthashChanged(_packId, _contenthash);
         packs[_packId].contenthash = _contenthash;
     }
 
@@ -185,6 +188,7 @@ contract StickerType is Controlled, TokenClaimer, ERC721Enumerable {
         external
         packOwner(_packId)
     {
+        emit MintabilityChanged(_packId, _mintable);
         packs[_packId].mintable = _mintable;
     }
 
