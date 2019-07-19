@@ -7,7 +7,7 @@ import "../../common/TokenClaimer.sol";
 /**
  * @author Ricardo Guilherme Schmidt (Status Research & Development GmbH)
  */
-contract StickerPack is Controlled, TokenClaimer, ERC721Full("Sticker Pack","STKP") {
+contract StickerPack is Controlled, TokenClaimer, ERC721Full("Status Sticker Pack","STKP") {
 
     mapping(uint256 => uint256) public tokenPackId; //packId
     uint256 public tokenCount; //tokens buys

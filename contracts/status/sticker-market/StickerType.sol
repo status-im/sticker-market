@@ -9,7 +9,7 @@ import "../../common/TokenClaimer.sol";
  * @author Ricardo Guilherme Schmidt (Status Research & Development GmbH)
  * StickerMarket allows any address register "StickerPack" which can be sold to any address in form of "StickerPack", an ERC721 token.
  */
-contract StickerType is Controlled, TokenClaimer, ERC721Full("Sticker Type","STKT") {
+contract StickerType is Controlled, TokenClaimer, ERC721Full("Status Sticker Pack Authorship","STKA") {
     using SafeMath for uint256;
     event Register(uint256 indexed packId, uint256 dataPrice, bytes _contenthash);
     event PriceChanged(uint256 indexed packId, uint256 dataPrice);
