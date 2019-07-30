@@ -44,7 +44,35 @@ module.exports = {
       },
     }
   },
-
+  livenet: {
+    contracts: {
+      MiniMeTokenFactory: {
+        deploy: false,
+        address: "0xa1c957C0210397D2d0296341627B74411756d476"
+      },
+      MiniMeToken: {
+        deploy: false,
+        address: "0x744d70FDBE2Ba4CF95131626614a1763DF805B9E"
+      },
+      StatusRoot: {
+        instanceOf: "StatusNetwork",
+        deploy: false,
+        address: "0x52aE2B53C847327f95A5084a7C38c0adb12fD302"
+      },
+      StickerPack: {
+        deploy: false,
+        address: "0x110101156e8F0743948B2A61aFcf3994A8Fb172e"
+      },
+      StickerType: {
+        deploy: false,
+        address: "0x0577215622f43a39f4bc9640806dfea9b10d2a36"
+      },
+      StickerMarket: {
+        deploy: false,
+        address: "0x12824271339304d3a9f7e096e62a2a7e73b4a7e7"
+      }
+    }
+  },
   testnet: {
     contracts: {
       MiniMeTokenFactory: {
@@ -59,6 +87,18 @@ module.exports = {
         instanceOf: "TestStatusNetwork",
         deploy: false,
         address: "0x34358C45FbA99ef9b78cB501584E8cBFa6f85Cef"
+      },
+      StickerPack: {
+        deploy: false,
+        address: "0xf852198D0385c4B871E0B91804ecd47C6bA97351"
+      },
+      StickerType: {
+        deploy: false,
+        address: "0x8cc272396Be7583c65BEe82CD7b743c69A87287D"
+      },
+      StickerMarket: {
+        deploy: false,
+        address: "0x6CC7274aF9cE9572d22DFD8545Fb8c9C9Bcb48AD"
       }
     }
   },
@@ -76,6 +116,18 @@ module.exports = {
         instanceOf: "TestStatusNetwork",
         deploy: false,
         address: "0xEdEB948dE35C6ac414359f97329fc0b4be70d3f1"
+      },
+      StickerPack: {
+        deploy: false,
+        address: "0xf852198D0385c4B871E0B91804ecd47C6bA97351"
+      },
+      StickerType: {
+        deploy: false,
+        address: "0x8cc272396Be7583c65BEe82CD7b743c69A87287D"
+      },
+      StickerMarket: {
+        deploy: false,
+        address: "0x6CC7274aF9cE9572d22DFD8545Fb8c9C9Bcb48AD"
       }
     }
   }
