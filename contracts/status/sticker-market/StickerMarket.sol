@@ -66,9 +66,9 @@ contract StickerMarket is Controlled, TokenClaimer, ApproveAndCallFallBack {
     }
 
     /** 
-     * @dev Mints NFT StickerPack in `msg.sender` account, and Transfers SNT using user allowance
+     * @dev Mints NFT StickerPack in `_destination` account, and Transfers SNT using user allowance
      * emit NonfungibleToken.Transfer(`address(0)`, `msg.sender`, `tokenId`)
-     * @notice buy a pack from market pack owner, including a StickerPack's token in msg.sender account with same metadata of `_packId` 
+     * @notice buy a pack from market pack owner, including a StickerPack's token in `_destination` account with same metadata of `_packId` 
      * @param _packId id of market pack 
      * @param _destination owner of token being brought
      * @param _price agreed price 
