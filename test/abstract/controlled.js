@@ -1,3 +1,4 @@
+// /*global contract, config, it, assert, artifacts*/
 
 exports.Test = (Controlled) => {
     describe("Controlled", async function() {

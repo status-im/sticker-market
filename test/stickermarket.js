@@ -1,47 +1,62 @@
-const EmbarkJS = require('Embark/EmbarkJS');
+// /*global contract, config, it, assert, artifacts, web3*/
+
 const Utils = require('../utils/testUtils');
-const MiniMeToken = require('Embark/contracts/MiniMeToken');
-const TestStatusNetwork = require('Embark/contracts/TestStatusNetwork');
-const StickerMarket = require('Embark/contracts/StickerMarket');
-const StickerPack = require('Embark/contracts/StickerPack');
-const StickerType = require('Embark/contracts/StickerType');
-const StickerMarketMigrated = require('Embark/contracts/StickerMarketMigrated');
+
+const MiniMeToken = artifacts.require('MiniMeToken');
+const TestStatusNetwork = artifacts.require('TestStatusNetwork');
+const StickerMarket = artifacts.require('StickerMarket');
+const StickerPack = artifacts.require('StickerPack');
+const StickerType = artifacts.require('StickerType');
+const StickerMarketMigrated = artifacts.require('StickerMarketMigrated');
 
 config({
-  contracts: {
-    "MiniMeTokenFactory": {},
-    "MiniMeToken": {
-      "args":["$MiniMeTokenFactory", "0x0", "0x0", "Status Test Token", 18, "STT", true],
-    },
-    "TestStatusNetwork": {
-      "args": ["0x0", "$MiniMeToken"],
-      "onDeploy": [
-        "await MiniMeToken.methods.changeController(TestStatusNetwork.address).send()",
-        "await TestStatusNetwork.methods.setOpen(true).send()",
-      ]
-    },
-    "StickerPack": {
-        "args": []
-    },
-    "StickerType": {
-        "args": []
-    },
-    "StickerMarket": {
-        "args": ["$MiniMeToken", "$StickerPack", "$StickerType"],
-        "onDeploy": [
+    contracts: {
+      deploy: {
+        MiniMeTokenFactory: {},
+        MiniMeToken: {
+          args: [
+            "$MiniMeTokenFactory",
+            "0x0000000000000000000000000000000000000000",
+            "0x0000000000000000000000000000000000000000",
+            "Status Test Token",
+            18,
+            "STT",
+            true
+          ]
+        },
+        TestStatusNetwork: {
+          args: ["0x0000000000000000000000000000000000000000", "$MiniMeToken"],
+          onDeploy: [
+            "await MiniMeToken.methods.changeController(TestStatusNetwork.address).send()",
+            "await TestStatusNetwork.methods.setOpen(true).send()"
+          ]
+        },
+        StickerPack: {
+          args: []
+        },
+        StickerType: {
+          args: []
+        },
+        StickerMarket: {
+          args: ["$MiniMeToken", "$StickerPack", "$StickerType"],
+          onDeploy: [
             "await StickerPack.methods.changeController(StickerMarket.address).send()",
-            "await StickerType.methods.changeController(StickerMarket.address).send()",
-        ]
-    },
-    "StickerMarketMigrated": {
-        "args": ["$StickerMarket"]
+            "await StickerType.methods.changeController(StickerMarket.address).send()"
+          ]
+        },
+        StickerMarketMigrated: {
+          args: ["$StickerMarket"]
+        }
+      }
     }
+  },
+  (_err, web3_accounts) => {
+    accounts = web3_accounts;
   }
-});
+);
 
 contract("StickerMarket", function() {
     this.timeout(0);
-    var accounts;
     var testPacks;
     var stickerPack;
     var stickerType;
@@ -49,15 +64,12 @@ contract("StickerMarket", function() {
     let registeredPacks = [];
     
     before(async function() {
-        accounts = await web3.eth.getAccounts();
-        stickerPack = new EmbarkJS.Blockchain.Contract({ 
-            abi: StickerPack._jsonInterface, 
-            address: await StickerMarket.methods.stickerPack().call() 
-        });
-        stickerType = new EmbarkJS.Blockchain.Contract({
-            abi: StickerType._jsonInterface,
-            address: await StickerMarket.methods.stickerType().call() 
-        });
+        StickerMarket.options.jsonInterface.push(StickerType.options.jsonInterface.find(x => x.type === 'event' && x.name === 'Register'));
+        StickerMarketMigrated.options.jsonInterface.push(StickerType.options.jsonInterface.find(x => x.type === 'event' && x.name === 'Register'));
+
+        stickerPack = new web3.eth.Contract(StickerPack.options.jsonInterface, await StickerMarket.methods.stickerPack().call());
+        stickerType = new web3.eth.Contract(StickerType.options.jsonInterface, await StickerMarket.methods.stickerType().call());
+
         testPacks = [
             {
                 category: ["0x00000000", "0x00000001","0x00000002","0x00000003","0x00000004"],
@@ -148,7 +160,7 @@ contract("StickerMarket", function() {
             let burnAddress =(await MiniMeToken.methods.controller().call());
             let controller = accounts[0];
             for(let j = 0; j < buy.events.Transfer.length; j++) {
-                if(buy.events.Transfer[j].address == MiniMeToken.address){
+                if(buy.events.Transfer[j].address == MiniMeToken.options.address){
                     if(buy.events.Transfer[j].returnValues.to == controller){
                         donated = buy.events.Transfer[j].returnValues.value;
                     }else if(buy.events.Transfer[j].returnValues.to == registeredPacks[i].data.owner){
@@ -156,16 +168,15 @@ contract("StickerMarket", function() {
                     }else if(buy.events.Transfer[j].returnValues.to == burnAddress){
                         burned = buy.events.Transfer[j].returnValues.value;
                     }
-                }else if(buy.events.Transfer[j].address == stickerPack.address){
+                }else if(buy.events.Transfer[j].address == stickerPack.options.address){
                     tokenId = buy.events.Transfer[j].returnValues.value;
                 }
             }
 
-
-            assert.equal(registeredPacks[i].data.price, (+toArtist + +donated + +burned))
-            assert.equal(burned, (registeredPacks[i].data.price * burnRate) / 10000, "Bad burn") 
-            assert.equal(donated, ((+registeredPacks[i].data.price - burned) * registeredPacks[i].data.donate)/10000, "Bad donate")
-            assert.equal(toArtist, registeredPacks[i].data.price - (+donated + +burned), "Bad profit")
+            assert.equal(registeredPacks[i].data.price, (+toArtist + +donated + +burned).toString())
+            assert.equal(burned.toString(), ((registeredPacks[i].data.price * burnRate) / 10000).toString(), "Bad burn") 
+            assert.equal(donated.toString(), (((+registeredPacks[i].data.price - burned) * registeredPacks[i].data.donate)/10000).toString(), "Bad donate")
+            assert.equal(toArtist.toString(), (registeredPacks[i].data.price - (+donated + +burned)).toString(), "Bad profit")
             assert.equal(await stickerPack.methods.ownerOf(tokenId).call(), packBuyer, "Bad owner")
             
         }
@@ -187,7 +198,7 @@ contract("StickerMarket", function() {
             let burnAddress =(await MiniMeToken.methods.controller().call());
             let controller = accounts[0];``
             for(let j = 0; j < buy.events.Transfer.length; j++) {
-                if(buy.events.Transfer[j].address == MiniMeToken.address){
+                if(buy.events.Transfer[j].address == MiniMeToken.options.address){
                     if(buy.events.Transfer[j].returnValues.to == controller){
                         donated = buy.events.Transfer[j].returnValues.value
                     }else if(buy.events.Transfer[j].returnValues.to == registeredPacks[i].data.owner){
@@ -195,15 +206,15 @@ contract("StickerMarket", function() {
                     }else if(buy.events.Transfer[j].returnValues.to == burnAddress){
                         burned = buy.events.Transfer[j].returnValues.value
                     }
-                }else if(buy.events.Transfer[j].address == stickerPack.address){
+                }else if(buy.events.Transfer[j].address == stickerPack.options.address){
                     tokenId = buy.events.Transfer[j].returnValues.value;
                 }
             }
 
-            assert.equal(registeredPacks[i].data.price, (+toArtist + +donated + +burned), "Bad payment")
-            assert.equal(burned, (registeredPacks[i].data.price * burnRate) / 10000, "Bad burn") 
-            assert.equal(donated, ((+registeredPacks[i].data.price - burned) * registeredPacks[i].data.donate)/10000, "Bad donate")
-            assert.equal(toArtist, registeredPacks[i].data.price - (+donated + +burned), "Bad profit")
+            assert.equal(registeredPacks[i].data.price, (+toArtist + +donated + +burned).toString(), "Bad payment")
+            assert.equal(burned, ((registeredPacks[i].data.price * burnRate) / 10000).toString(), "Bad burn") 
+            assert.equal(donated.toString(), (((+registeredPacks[i].data.price - burned) * registeredPacks[i].data.donate)/10000).toString(), "Bad donate")
+            assert.equal(toArtist.toString(), (registeredPacks[i].data.price - (+donated + +burned)).toString(), "Bad profit")
             assert.equal(await stickerPack.methods.ownerOf(tokenId).call(), packBuyer, "Bad owner")
             
         }

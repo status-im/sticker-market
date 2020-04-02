@@ -1,7 +1,7 @@
 pragma solidity >=0.5.0 <0.6.0;
 
-import "../../openzeppelin/math/SafeMath.sol";
-import "../../openzeppelin/token/ERC721/ERC721Full.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol";
 import "../../common/Controlled.sol";
 import "../../common/TokenClaimer.sol";
 

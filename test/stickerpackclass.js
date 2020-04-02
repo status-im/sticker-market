@@ -1,89 +1,87 @@
-const EmbarkJS = require('Embark/EmbarkJS');
-const Utils = require('../utils/testUtils');
-const MiniMeToken = require('Embark/contracts/MiniMeToken');
-const TestStatusNetwork = require('Embark/contracts/TestStatusNetwork');
-const StickerMarket = require('Embark/contracts/StickerMarket');
-const StickerPack = require('Embark/contracts/StickerPack');
-const StickerType = require('Embark/contracts/StickerType');
-const StickerMarketMigrated = require('Embark/contracts/StickerMarketMigrated');
+// /*global contract, config, it, assert, artifacts, web3*/
+
+const StickerType = artifacts.require('StickerType');
+
+let accounts;
 
 config({
   contracts: {
-    "StickerType": {
-        "args": []
+    deploy: {
+        "StickerType": {
+            "args": []
+        }
     }
   }
-});
+},
+(_err, web3_accounts) => {
+  accounts = web3_accounts;
+}
+);
 
 contract("StickerType", function() {
     this.timeout(0);
-    var accounts;
     var testPacks;
     let registeredPacks = [];
     
-    before(function(done) {
-        web3.eth.getAccounts().then(function (res) {
-            accounts = res;
-            testPacks = [
-                {
-                    category: ["0x00000000", "0x00000001","0x00000002","0x00000003","0x00000004"],
-                    price: "10000000000000000000",
-                    donate: "0",
-                    contentHash:"0x55c72bf3b3d468c7c36c848a4d49bb11101dc79bc2f6484bf1ef796fc498919a",
-                    owner: accounts[1]
-                },
-                {
-                    category: ["0x00000000", "0x00000001"],
-                    price: "10000000000000000000",
-                    donate: "10",
-                    contentHash:"0xe434491f185cedfea522bd0b937ce849906833aefa20a76e8e50db194baf34cb",
-                    owner: accounts[2]
-                },
-                {
-                    category: ["0x00000000", "0x00000001","0x00000002","0x00000004"],
-                    price: "10000000000000000000",
-                    donate: "100",
-                    contentHash:"0xf4c247e858aba2942bf0ed6008c15a387c88c262c70f930ab91799655d71367d",
-                    owner: accounts[3]
-                },
-                {
-                    category: ["0x00000000", "0x00000002","0x00000003","0x00000004"],
-                    price: "10000000000000000000",
-                    donate: "1000",
-                    contentHash:"0x66c2aec914d17249c66a750303521a51607c38d084ae173976e54ad40473d056",
-                    owner: accounts[4]
-                },
-                {
-                    category: ["0x00000000", "0x00000001","0x00000002","0x00000004"],
-                    price: "10000000000000000000",
-                    donate: "10000",
-                    contentHash:"0x4e25277a1af127bd1c2fce6aa20ac7eae8fded9c615b7964ebe9e18779765108",
-                    owner: accounts[5]
-                },
-                {
-                    category: ["0x00000000", "0x00000004"],
-                    price: "10000000000000000000",
-                    donate: "2",
-                    contentHash:"0x659c423e40fc2b4f37ada1dda463aa4455d650d799d82e63af87ac8b714bee66",
-                    owner: accounts[6]
-                },
-                {
-                    category: ["0x00000000", "0x00000003","0x00000004"],
-                    price: "10000000000000000000",
-                    donate: "20",
-                    contentHash:"0xbbf932b8a154bc1d496ebbfa2acca571119d53a6cb5986d8a187e85ac8a37265",
-                    owner: accounts[7]
-                },
-                {
-                    category: ["0x00000000", "0x00000003"],
-                    price: "10000000000000000000",
-                    donate: "200",
-                    contentHash:"0x6dd4cbc4a86825506bf85defa071a4e6ac5d76a1b6912863ef0e289327df08d2",
-                    owner: accounts[8]
-                }
-            ];
-            done();
-        });
+    before(() => {
+        testPacks = [
+            {
+                category: ["0x00000000", "0x00000001","0x00000002","0x00000003","0x00000004"],
+                price: "10000000000000000000",
+                donate: "0",
+                contentHash:"0x55c72bf3b3d468c7c36c848a4d49bb11101dc79bc2f6484bf1ef796fc498919a",
+                owner: accounts[1]
+            },
+            {
+                category: ["0x00000000", "0x00000001"],
+                price: "10000000000000000000",
+                donate: "10",
+                contentHash:"0xe434491f185cedfea522bd0b937ce849906833aefa20a76e8e50db194baf34cb",
+                owner: accounts[2]
+            },
+            {
+                category: ["0x00000000", "0x00000001","0x00000002","0x00000004"],
+                price: "10000000000000000000",
+                donate: "100",
+                contentHash:"0xf4c247e858aba2942bf0ed6008c15a387c88c262c70f930ab91799655d71367d",
+                owner: accounts[3]
+            },
+            {
+                category: ["0x00000000", "0x00000002","0x00000003","0x00000004"],
+                price: "10000000000000000000",
+                donate: "1000",
+                contentHash:"0x66c2aec914d17249c66a750303521a51607c38d084ae173976e54ad40473d056",
+                owner: accounts[4]
+            },
+            {
+                category: ["0x00000000", "0x00000001","0x00000002","0x00000004"],
+                price: "10000000000000000000",
+                donate: "10000",
+                contentHash:"0x4e25277a1af127bd1c2fce6aa20ac7eae8fded9c615b7964ebe9e18779765108",
+                owner: accounts[5]
+            },
+            {
+                category: ["0x00000000", "0x00000004"],
+                price: "10000000000000000000",
+                donate: "2",
+                contentHash:"0x659c423e40fc2b4f37ada1dda463aa4455d650d799d82e63af87ac8b714bee66",
+                owner: accounts[6]
+            },
+            {
+                category: ["0x00000000", "0x00000003","0x00000004"],
+                price: "10000000000000000000",
+                donate: "20",
+                contentHash:"0xbbf932b8a154bc1d496ebbfa2acca571119d53a6cb5986d8a187e85ac8a37265",
+                owner: accounts[7]
+            },
+            {
+                category: ["0x00000000", "0x00000003"],
+                price: "10000000000000000000",
+                donate: "200",
+                contentHash:"0x6dd4cbc4a86825506bf85defa071a4e6ac5d76a1b6912863ef0e289327df08d2",
+                owner: accounts[8]
+            }
+        ];
     });
 
     it("should register packs", async function() {
@@ -134,7 +132,7 @@ contract("StickerType", function() {
         let packId = reg.events.Register.returnValues.packId;
         let r = await StickerType.methods.setPackPrice(packId, 100, 0).send({from: packOwner});
         assert.equal(r.events.PriceChanged.returnValues.packId, packId)
-        assert.equal(r.events.PriceChanged.returnValues.dataPrice, 100)
+        assert.equal(r.events.PriceChanged.returnValues.dataPrice, '100')
         await StickerType.methods.purgePack(packId, 0).send();  
     });
       
@@ -156,7 +154,7 @@ contract("StickerType", function() {
         let packId = reg.events.Register.returnValues.packId;
         let r = await StickerType.methods.setPackPrice(packId, 100, 50).send();
         assert.equal(r.events.PriceChanged.returnValues.packId, packId)
-        assert.equal(r.events.PriceChanged.returnValues.dataPrice, 100)
+        assert.equal(r.events.PriceChanged.returnValues.dataPrice, '100')
         await StickerType.methods.purgePack(packId, 0).send();  
     });
 
