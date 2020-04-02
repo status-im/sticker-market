@@ -1,35 +1,34 @@
 module.exports = {
+  // applies to all environments
   default: {
     enabled: true,
-    rpcHost: "localhost", 
-    rpcPort: 8545, 
-    rpcCorsDomain: {
-      auto: true,
-      additionalCors: []
-    },
-    wsRPC: true,
-    wsOrigins: { 
-      auto: true,
-      additionalCors: []
-    },
-    wsHost: "localhost",
-    wsPort: 8546 
+    client: "geth"
   },
 
+  // default environment, merges with the settings in default
+  // assumed to be the intended environment by `embark run` and `embark blockchain`
   development: {
-    ethereumClientName: "geth", 
-    networkType: "custom", 
-    networkId: 1337,
-    isDev: true,
-    datadir: ".embark/development/datadir",
-    mineWhenNeeded: true, 
-    nodiscover: true, 
-    maxpeers: 0, 
-    proxy: true, 
-    targetGasLimit: 8000000, 
-    simulatorBlocktime: 0
+    client: "ganache-cli",
+    clientConfig: {
+      miningMode: 'dev'
+    }
   },
 
+  // merges with the settings in default
+  // used with "embark run privatenet" and/or "embark blockchain privatenet"
+  privatenet: {
+    clientConfig: {
+      miningMode: 'auto'
+    },
+    datadir: ".embark/privatenet/datadir",
+    accounts: [
+      {
+        nodeAccounts: true,
+        password: "config/privatenet/password" // Password to unlock the account
+      }
+    ]
+  },
+  
   testnet: {
     networkType: "testnet",
     syncMode: "light",
