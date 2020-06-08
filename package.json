@@ -20,12 +20,12 @@
   "bugs": {
     "url": "https://github.com/status-im/contracts/issues"
   },
-  "homepage": "https://github.com/status-im/contracts#readme",
-  "devDependencies": {
-    "embark": "^5.3.0-nightly.7"
-  },
-    "dependencies": {
+    "homepage": "https://github.com/status-im/contracts#readme",
+  "dependencies": {
     "@trailofbits/embark-contract-info": "^1.1.0",
     "openzeppelin-solidity": "^2.3.0"
+  },
+  "devDependencies": {
+    "embark": "^5.3.0-nightly.7"
   }
 }
