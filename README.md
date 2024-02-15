@@ -1,5 +1,21 @@
 # Status.im Sticker Market Dapp
 
+
+## Deployments
+
+| **Contract**                | **Address**                                                                                                                             |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | 
+| **Mainnet**                 |                                                                                                                                         |                                                                                                                   |
+| StickerMarket      | [`0x12824271339304d3a9f7e096e62a2a7e73b4a7e7`](https://etherscan.io/address/0x12824271339304d3a9f7e096e62a2a7e73b4a7e7#code)                 |
+| StickerPack | [`0x110101156e8F0743948B2A61aFcf3994A8Fb172e`](https://etherscan.io/address/0x110101156e8F0743948B2A61aFcf3994A8Fb172e#code)                 | 
+| StickerType  | [`0x0577215622f43a39f4bc9640806dfea9b10d2a36`](https://etherscan.io/address/0x0577215622f43a39f4bc9640806dfea9b10d2a36#code)                 | 
+| **Sepolia**                 |                                                                                                                                         |                                                                                                                   |
+| StickerMarket      | [`0xf852198D0385c4B871E0B91804ecd47C6bA97351`](https://sepolia.etherscan.io/address/0xf852198d0385c4b871e0b91804ecd47c6ba97351#code)                 |
+| StickerPack | [`0x8cc272396Be7583c65BEe82CD7b743c69A87287D`](https://sepolia.etherscan.io/address/0x8cc272396be7583c65bee82cd7b743c69a87287d#code)                 | 
+| StickerType  | [`0x5aCBae26C23427AEeE0A7f26949f093577a61AAb`](https://sepolia.etherscan.io/address/0x5acbae26c23427aeee0a7f26949f093577a61aab#code)                 | 
+
+
+
 ## Folders
 - `analyzers`: Folder for analyzer output files
 - `app`: Folder containing application for moving Status Test Tokens
