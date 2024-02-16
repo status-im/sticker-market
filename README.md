@@ -5,7 +5,7 @@ Sticker Market is composed of 3 contracts:
 - StickerMarket main contract, which is the minter of two other NFT smart contract addresses, StickerType and StickerPack. It allows users to mint StickerType, which contains a content-hash link, and other users to mint StickerPack referenced to certain StickerTypes. 
 - A purchase NFT (StickerPack) referencing a StickerType, which is granted to any account who paid the value defined in the StickerType while it sale was available. 
 
-Therefore, it models an envoirment where artists can publish their packs for sale, that can be used in official Status app, by holders of StickerType. 
+Therefore, it models an envoirment where artists can publish their packs for sale, that can be used in official Status app, by holders of StickerPack.  Artists can also sell their token, which new owner could set a new payment address.
 
 ## Deployments
 
