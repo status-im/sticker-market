@@ -1,5 +1,11 @@
 # Status.im Sticker Market Dapp
 
+Sticker Market is composed of 3 contracts: 
+- An authorship NFT (`StickerType`) which is granted to every registered `StickerPack` in `StickerMarket`, intended use is to change the deposit address for all `StickerPack`s sold in `StickerMarket`.
+- `StickerMarket` main contract, which is the minter of two other NFT smart contract addresses, `StickerType` and `StickerPack`. It allows users to mint `StickerType`, which contains a content-hash link, and other users to mint `StickerPack` referenced to certain `StickerType`s. 
+- A purchase NFT (`StickerPack`) referencing a `StickerType`, which is granted to any account who paid the value defined in the `StickerType` while it sale was available. 
+
+Therefore, it models an environment where artists can publish their packs for sale, that can be used in the official Status app, by holders of `StickerPack`.  Artists can also sell their tokens, which new owners could set a new payment address.
 
 ## Deployments
 
